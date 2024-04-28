@@ -188,5 +188,6 @@ def diffmap(data):
 
 
 
-dimension_reductions = [umap, diffmap, pca, tsne]
-dimension_reductions = [pca]"""
+#dimension_reductions = [umap, diffmap, pca, tsne]
+dimension_reductions =  [pca]
+"""

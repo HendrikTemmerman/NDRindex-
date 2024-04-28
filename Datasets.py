@@ -19,7 +19,5 @@ dataset3 = sc.read_10x_mtx("dataset3")
 metadata3 = pd.read_csv("dataset3/metadata_v2.tsv", header=0, sep='\t').iloc[1:]
 metadata3.reset_index(drop=True, inplace=True)
 
-#datasets = [dataset1, dataset2, dataset3]
 
-
-datasets = [dataset2]
+datasets = [dataset1, dataset2, dataset3]

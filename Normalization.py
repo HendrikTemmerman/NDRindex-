@@ -1,10 +1,8 @@
 
 import pandas as pd
 import numpy as np
-import anndata
 from rpy2 import robjects
 from rpy2.robjects import pandas2ri
-
 def total_count_normalization(data):
     # Convert Anndata object to DataFrame
     adata_df = pd.DataFrame(data.X, columns=data.var_names, index=data.obs_names)
@@ -112,7 +110,10 @@ def scale_normalization(data):
 
 normalizations =[total_count_normalization]
 
+
 """
+
+
 import scanpy as sc
 
 
@@ -130,5 +131,5 @@ def scale_normalization(data):
 
 
 #normalizations = [total_count_normalization, log_normalization, scale_normalization]
-normalizations =[total_count_normalization]
+normalizations = [total_count_normalization]
 """
