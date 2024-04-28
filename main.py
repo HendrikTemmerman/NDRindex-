@@ -11,6 +11,7 @@ counter = 1
 for dataset in datasets:
     for normalize in normalizations:
         for reduce_dimension in dimension_reductions:
+            print("------------------", str(normalize.__name__).capitalize(), "---------------", str(reduce_dimension.__name__).capitalize(), "---------------")
             adata = cp.deepcopy(dataset)
             normalize(adata)
             sc.pp.neighbors(adata, use_rep='X')
@@ -18,7 +19,6 @@ for dataset in datasets:
 
             # If you just want the raw data matrix (genes x cells)
             data_matrix = adata.X
-
 
             # If the data matrix is sparse, convert it to a dense format
             if isinstance(data_matrix, np.ndarray):

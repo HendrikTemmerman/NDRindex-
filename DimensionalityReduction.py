@@ -1,193 +1,52 @@
-import rpy2.robjects as robjects
-from rpy2.robjects import pandas2ri
-pandas2ri.activate()
-import pandas as pd
-
-
-
-def pca(data):
-
-    # Assuming 'adata' is your Anndata object
-    adata_df = pd.DataFrame(data.X, columns=data.var_names, index=data.obs_names)
-    # Pass the DataFrame to R
-    robjects.globalenv['adata_df'] = pandas2ri.py2rpy(adata_df)
-
-    # Your R code
-    robjects.r('''
-        library(irlba)
-
-        # Perform PCA using irlba
-        pca_result <- irlba(t(adata_df), nv = min(nrow(adata_df), ncol(adata_df)), center = TRUE, scale = TRUE)
-
-        # Extract PCA results
-        pca_scores <- pca_result$u
-        pca_loadings <- pca_result$v
-
-        # Return PCA scores and loadings
-        pca_results <- list(scores = pca_scores, loadings = pca_loadings)
-    ''')
-
-    # Retrieve PCA results back to Python
-    pca_scores = robjects.globalenv['pca_results'].rx2('scores')
-    pca_loadings = robjects.globalenv['pca_results'].rx2('loadings')
-    return pca_scores, pca_loadings
-
-
-def tsne(data):
-    # Convert Anndata object to DataFrame
-    adata_df = pd.DataFrame(data.X, columns=data.var_names, index=data.obs_names)
-
-    # Pass the DataFrame to R
-    robjects.globalenv['adata_df'] = pandas2ri.py2rpy(adata_df)
-
-    # Your R code
-    robjects.r('''
-        library(scanpy)
-
-        # Perform t-SNE using Scanpy
-        sc.tl.tsne(data, n_pcs = 50)
-
-        # Extract t-SNE results
-        tsne_coords <- data$obsm[['X_tsne']]
-
-        # Return t-SNE coordinates
-        result <- tsne_coords
-    ''')
-
-    # Retrieve results back to Python
-    tsne_coords = robjects.globalenv['result']
-
-    return tsne_coords
-
-
-
-
-
-def umap(data):
-    # Convert Anndata object to DataFrame
-    adata_df = pd.DataFrame(data.X, columns=data.var_names, index=data.obs_names)
-
-    # Pass the DataFrame to R
-    robjects.globalenv['adata_df'] = pandas2ri.py2rpy(adata_df)
-
-    # Your R code
-    robjects.r('''
-        library(umap)
-        library(scanpy)
-
-        # Compute neighbors using Scanpy
-        sc.pp.neighbors(data, n_pcs = 50)
-
-        # Perform UMAP using Scanpy
-        sc.tl.umap(data)
-
-        # Extract UMAP coordinates
-        umap_coords <- data$obsm[['X_umap']]
-
-        # Return UMAP coordinates
-        result <- umap_coords
-    ''')
-
-    # Retrieve results back to Python
-    umap_coords = robjects.globalenv['result']
-
-    return umap_coords
-
-
-
-
-
-def diffmap(data):
-    # Convert Anndata object to DataFrame
-    adata_df = pd.DataFrame(data.X, columns=data.var_names, index=data.obs_names)
-
-    # Pass the DataFrame to R
-    robjects.globalenv['adata_df'] = pandas2ri.py2rpy(adata_df)
-
-    # Your R code
-    robjects.r('''
-        library(scanpy)
-
-        # Perform Diffmap using Scanpy
-        sc.tl.diffmap(data)
-
-        # Extract Diffmap coordinates
-        diffmap_coords <- data$obsm[['X_diffmap']]
-
-        # Return Diffmap coordinates
-        result <- diffmap_coords
-    ''')
-
-    # Retrieve results back to Python
-    diffmap_coords = robjects.globalenv['result']
-
-    return diffmap_coords
-
-
-
-
-dimension_reductions = [pca]
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-"""
+from sammon import sammon
 import scanpy as sc
-
+import numpy as np
+import pandas as pd
+from sklearn.manifold import TSNE
+from scipy.sparse import issparse
 
 
 def pca(data):
+    print("Before reduction:", data.shape)
     sc.pp.pca(data, svd_solver='arpack')
+    print("Reduced by pca:", data.obsm['X_pca'].shape)
 
 
 def tsne(data):
+    print("Before reduction:", data.shape)
     sc.tl.tsne(data, n_pcs=50)
+    print("Reduced by tsne:", data.obsm["X_tsne"].shape)
+
+
+def tsne2(data):
+    x = data.X
+    print("Before reduction:", x.shape)
+    reduced_x = TSNE(n_components=2, perplexity=20, init="random").fit_transform(x)
+    data.obsm["X_tsne2"] = reduced_x
+    print("Reduced by tsne2", reduced_x.shape)
 
 
 def umap(data):
-    sc.pp.neighbors(data, n_pcs=50)
-    sc.tl.umap(data,)
+    print("Before reduction:", data.shape)
+    sc.pp.neighbors(data, n_pcs=50, use_rep='X')
+    sc.tl.umap(data)
+    print("Reduced by umap:", data.obsm["X_umap"].shape)
 
 
 def diffmap(data):
+    print("Before reduction:", data.shape)
     sc.tl.diffmap(data)
+    print("Reduced by diffmap:", data.obsm["X_diffmap"].shape)
 
 
+def sammon_reduction(data):
+    if issparse(data.X):
+        x = data.X.toarray()
+    else:
+        x = data.X
+    reduced_x, stress = sammon.sammon(x)
+    data.obsm["X_sammon_reduction"] = reduced_x
+    print("Reduced by sammon:", data.obsm["X_sammon_reduction"].shape)
 
 
-#dimension_reductions = [umap, diffmap, pca, tsne]
-dimension_reductions =  [pca]
-"""
+dimension_reductions = [sammon_reduction, pca, tsne, tsne2, umap, diffmap]

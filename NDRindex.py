@@ -9,14 +9,14 @@ def NDRindex(data):
     X = data[0]
     y = data[1]
 
+    n = X.shape[0]
+
 
     #n, d = X.shape
-    n = len(X)
-    print('shape: ', X.shape)
-    print('shape: ', y.shape)
+    #n = len(X)
 
 
-    M = np.median([distance.euclidean([X[i]], [X[j]]) for i in range(len(X)) for j in range(i + 1, len(X))])
+    M = np.median([distance.euclidean([X[i]], [X[j]]) for i in range(n) for j in range(i + 1, n)])
 
 
     average_scale = M / np.log10(n)
@@ -52,7 +52,7 @@ def NDRindex(data):
 
     R = R / K
     NDRindex = 1.0 - R / average_scale
-    print('Y: ', Y, '-- y: ', y)
+    #print('Y: ', Y, '-- y: ', y)
     print("NDRindex:", NDRindex)
     print("ARI:", adjusted_rand_score(y, Y))
     return NDRindex
