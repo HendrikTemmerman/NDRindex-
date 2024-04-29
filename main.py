@@ -8,13 +8,13 @@ from NDRindex import NDRindex
 
 counter = 1
 
-for dataset in datasets:
+for dataset, true_labels in datasets:
     for normalize in normalizations:
         for reduce_dimension in dimension_reductions:
             print("------------------", str(normalize.__name__).capitalize(), "---------------", str(reduce_dimension.__name__).capitalize(), "---------------")
             adata = cp.deepcopy(dataset)
             normalize(adata)
-            sc.pp.neighbors(adata, use_rep='X')
+            #sc.pp.neighbors(adata, use_rep='X')
             reduce_dimension(adata)
 
             # If you just want the raw data matrix (genes x cells)
@@ -38,5 +38,5 @@ for dataset in datasets:
 
 
             # Now you can pass ndr_input to the NDRindex function
-            print("NDRindex for dataset", counter, ": ",  normalize.__name__, " and ", dimension_reduction_method, ": ", NDRindex(ndr_input))
+            print("NDRindex for dataset", counter, ": ",  normalize.__name__, " and ", dimension_reduction_method, ": ", NDRindex(ndr_input, true_labels))
     counter += 1

@@ -40,6 +40,7 @@ def diffmap(data):
 
 
 def sammon_reduction(data):
+    print("Before reduction:", data.shape)
     if issparse(data.X):
         x = data.X.toarray()
     else:
@@ -49,4 +50,4 @@ def sammon_reduction(data):
     print("Reduced by sammon:", data.obsm["X_sammon_reduction"].shape)
 
 
-dimension_reductions = [sammon_reduction, pca, tsne, tsne2, umap, diffmap]
+dimension_reductions = [pca, sammon_reduction, tsne, tsne2, umap, diffmap]
