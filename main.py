@@ -4,7 +4,8 @@ from Datasets import datasets
 from Normalization import normalizations
 from DimensionalityReduction import dimension_reductions
 import numpy as np
-from NDRindex import NDRindex
+#from NDRindex import NDRindex
+from newNDRindex import NDRindex
 
 counter = 1
 
@@ -14,7 +15,7 @@ for dataset, true_labels in datasets:
             print("------------------", str(normalize.__name__).capitalize(), "---------------", str(reduce_dimension.__name__).capitalize(), "---------------")
             adata = cp.deepcopy(dataset)
             normalize(adata)
-            #sc.pp.neighbors(adata, use_rep='X')
+            sc.pp.neighbors(adata, use_rep='X')
             reduce_dimension(adata)
 
             # If you just want the raw data matrix (genes x cells)

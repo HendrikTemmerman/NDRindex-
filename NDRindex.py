@@ -16,7 +16,6 @@ def NDRindex(data, true_y):
     # Initialize clusters
     gcenter = {}
     Y = np.full(n, -1)  # Cluster assignments
-    print(Y)
 
     K = 1
     R = 0
@@ -28,6 +27,8 @@ def NDRindex(data, true_y):
         for j in range(n):
             if Y[j] == -1:  # If point j is not assigned to a cluster
                 distances_to_centers = [distance.euclidean(gcenter[k], X[j]) for k in gcenter]
+                print(distances_to_centers)
+                print(average_scale)
                 nearest_cluster = np.argmin(distances_to_centers) + 1
                 if distances_to_centers[nearest_cluster - 1] < average_scale:
                     Y[j] = nearest_cluster

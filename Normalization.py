@@ -17,7 +17,8 @@ def scale_normalization(data):
 def tmm(data):
     pass
 
-normalizations = [total_count_normalization, log_normalization, scale_normalization]
+#normalizations = [total_count_normalization, log_normalization, scale_normalization]
+normalizations = [total_count_normalization]
 
 # import pandas as pd
 # import numpy as np
