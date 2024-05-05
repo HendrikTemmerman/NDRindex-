@@ -1,7 +1,5 @@
 from sammon import sammon
 import scanpy as sc
-import numpy as np
-import pandas as pd
 from sklearn.manifold import TSNE
 from scipy.sparse import issparse
 
