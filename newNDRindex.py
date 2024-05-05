@@ -50,8 +50,7 @@ def NDRindex(data,true_y):
 
     R /= K
     NDRscore = 1 - (R / (M / np.log10(n)))
-    print("ARI:", adjusted_rand_score(true_y, Y))
-    print("NDRscore: ", NDRscore)
+    #print("NDRscore: ", NDRscore)
     return NDRscore
 
 

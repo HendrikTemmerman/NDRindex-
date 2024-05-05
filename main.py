@@ -6,6 +6,7 @@ from DimensionalityReduction import dimension_reductions
 import numpy as np
 #from NDRindex import NDRindex
 from newNDRindex import NDRindex
+from ARI import calculated_ARI
 
 counter = 1
 
@@ -39,5 +40,5 @@ for dataset, true_labels in datasets:
 
 
             # Now you can pass ndr_input to the NDRindex function
-            print("NDRindex for dataset", counter, ": ",  normalize.__name__, " and ", dimension_reduction_method, ": ", NDRindex(ndr_input, true_labels))
+            print("NDRindex for dataset", counter, ": ",  normalize.__name__, " and ", dimension_reduction_method, ": ", NDRindex(ndr_input, true_labels), " and the ARI is equal to ", calculated_ARI(ndr_input, true_labels))
     counter += 1
