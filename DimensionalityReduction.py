@@ -48,4 +48,5 @@ def sammon_reduction(data):
     print("Reduced by sammon:", data.obsm["X_sammon_reduction"].shape)
 
 
-dimension_reductions = [pca, sammon_reduction, tsne, tsne2, umap, diffmap]
+#dimension_reductions = [pca, sammon_reduction, tsne, tsne2, umap, diffmap]
+dimension_reductions = [pca, tsne, tsne2, umap, diffmap]
