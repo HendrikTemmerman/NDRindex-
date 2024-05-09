@@ -1,53 +1,56 @@
 from scipy.spatial import distance
-from numpy.random import choice
 import numpy as np
-from sklearn.metrics import adjusted_rand_score
+
+count = 0
 
 
-def NDRindex(data, true_y):
-
-    X = data
-    n = data.shape[0]
-
-    M = np.median([distance.euclidean(X[i], X[j]) for i in range(n) for j in range(i + 1, n)])
-
-
-    average_scale = M / np.log10(n)
-    # Initialize clusters
-    gcenter = {}
-    Y = np.full(n, -1)  # Cluster assignments
+def NDRindex(data):
+    n, d = data.shape
+    A = np.random.choice(range(n))
 
     K = 1
-    R = 0
-    random_point = choice(range(n))
-    Y[random_point] = K
-    gcenter[K] = X[random_point]
 
-    while np.any(Y == -1):  # While there are points not assigned to a cluster
+    Y = np.full(n, -1)
+    Y[A] = K
+    geometric_centers = {K: data[A]}
+
+    distances = distance.pdist(data, 'euclidean')
+    M = np.percentile(distances, 25)
+
+    average_scale = M / np.log10(n)
+
+    while np.any(Y == -1):
+        B_index = np.argmax(Y == -1)
+        B = data[B_index]
+
         for j in range(n):
-            if Y[j] == -1:  # If point j is not assigned to a cluster
-                distances_to_centers = [distance.euclidean(gcenter[k], X[j]) for k in gcenter]
-                print(distances_to_centers)
-                print(average_scale)
-                nearest_cluster = np.argmin(distances_to_centers) + 1
-                if distances_to_centers[nearest_cluster - 1] < average_scale:
-                    Y[j] = nearest_cluster
-                    cluster_points = X[Y == nearest_cluster]
-                    gcenter[nearest_cluster] = np.mean(cluster_points, axis=0)
-                else:
-                    K += 1
-                    Y[j] = K
-                    gcenter[K] = X[j]
+            point = data[j]
+            if Y[j] == -1 and distance.euclidean(geometric_centers[K], point) < distance.euclidean(geometric_centers[K], B):
+                B = point
+                B_index = j
 
-    # Calculate NDRindex
-    for k in gcenter:
-        cluster_points = X[Y == k]
-        R += sum([distance.euclidean(gcenter[k], p) for p in cluster_points]) / len(cluster_points)
+        if distance.euclidean(geometric_centers[K], B) < average_scale:
+            Y[B_index] = K
+            geometric_centers[K] = np.mean(data[Y == K], axis=0)
+
+        else:
+            K += 1
+            Y[B_index] = K
+            geometric_centers[K] = B
+
+    R = 0
+    for i in geometric_centers:
+        points_i = data[Y == i]
+        size_i = len(points_i)
+        average_distance = 0
+        for p in points_i:
+            average_distance += distance.euclidean(p, geometric_centers[i])
+        average_distance /= size_i
+        R += average_distance
+    R /= K
+
+    NDRindex = 1.0 - (R / average_scale)
+    return NDRindex
 
 
-    R = R / K
-    ndrindex = 1.0 - R / average_scale
-    print("NDRindex:", ndrindex)
-    print(Y[0:10])
-    print("ARI:", adjusted_rand_score(true_y, Y))
-    return ndrindex
+

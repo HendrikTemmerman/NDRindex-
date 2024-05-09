@@ -1,131 +1,58 @@
 import scanpy as sc
+import numpy as np
+import pandas as pd
 
+import rpy2.robjects as robjects
+from rpy2.robjects import pandas2ri
+from rpy2.robjects.packages import importr
 
-def total_count_normalization(data):
-    sc.pp.normalize_total(data, target_sum=1e6)
+def seurat(data):
+    sc.pp.normalize_total(data, target_sum=1e4)
+    print("Normalized")
+    return data
 
 
 def log_normalization(data):
     sc.pp.normalize_total(data, target_sum=1e6)
     sc.pp.log1p(data)
+    print("Normalized")
+    return data
 
 
-def scale_normalization(data):
+def scale(data):
     sc.pp.scale(data)
+    print("Normalized")
+    return data
+
 
 
 def tmm(data):
-    pass
+    df = data.to_df()
+    pandas2ri.activate()
+    robjects.r('''
+        library(edgeR)
+    ''')
+    edgeR = importr('edgeR')
 
-normalizations = [total_count_normalization, log_normalization, scale_normalization]
+    col_sums = df.sum(axis=0)
+    df_filtered = df.loc[:, col_sums > 0]
 
-# import pandas as pd
-# import numpy as np
-# from rpy2 import robjects
-# from rpy2.robjects import pandas2ri
-# def total_count_normalization(data):
-#     # Convert Anndata object to DataFrame
-#     adata_df = pd.DataFrame(data.X, columns=data.var_names, index=data.obs_names)
-#
-#     # Pass the DataFrame to R
-#     robjects.globalenv['adata_df'] = pandas2ri.py2rpy(adata_df)
-#
-#     # Your R code
-#     robjects.r('''
-#         library(scanpy)
-#
-#         # Convert the DataFrame back to an Anndata object
-#         adata <- as.list(adata_df)
-#         adata <- AnnData(X = adata$X, obs = adata$obs, var = adata$var)
-#
-#         # Perform total count normalization
-#         sc.pp.normalize_total(adata, target_sum=1e6)
-#
-#         # Extract the normalized data
-#         normalized_data <- adata$X
-#
-#         # Return the normalized data
-#         result <- normalized_data
-#     ''')
-#
-#     # Retrieve results back to Python
-#     normalized_data = robjects.globalenv['result']
-#
-#     # Update the data with the normalized values
-#     data.X = np.array(normalized_data)
-#
-#     return data
-#
-#
-#
-# def log_normalization(data):
-#     # Convert Anndata object to DataFrame
-#     adata_df = pd.DataFrame(data.X, columns=data.var_names, index=data.obs_names)
-#
-#     # Pass the DataFrame to R
-#     robjects.globalenv['adata_df'] = pandas2ri.py2rpy(adata_df)
-#
-#     # Your R code
-#     robjects.r('''
-#         library(scanpy)
-#
-#         # Convert the DataFrame back to an Anndata object
-#         adata <- as.list(adata_df)
-#         adata <- AnnData(X = adata$X, obs = adata$obs, var = adata$var)
-#
-#         # Perform total count normalization
-#         sc.pp.normalize_total(adata, target_sum=1e6)
-#
-#         # Perform logarithmic transformation
-#         sc.pp.log1p(adata)
-#
-#         # Extract the normalized and log-transformed data
-#         normalized_log_data <- adata$X
-#
-#         # Return the normalized and log-transformed data
-#         result <- normalized_log_data
-#     ''')
-#
-#     # Retrieve results back to Python
-#     normalized_log_data = robjects.globalenv['result']
-#
-#     # Update the data with the normalized and log-transformed values
-#     data.X = np.array(normalized_log_data)
-#
-#     return data
-#
-#
-# def scale_normalization(data):
-#     # Convert Anndata object to DataFrame
-#     adata_df = pd.DataFrame(data.X, columns=data.var_names, index=data.obs_names)
-#
-#     # Pass the DataFrame to R
-#     robjects.globalenv['adata_df'] = pandas2ri.py2rpy(adata_df)
-#
-#     # Your R code
-#     robjects.r('''
-#         library(scanpy)
-#
-#         # Convert the DataFrame back to an Anndata object
-#         adata <- as.list(adata_df)
-#         adata <- AnnData(X = adata$X, obs = adata$obs, var = adata$var)
-#
-#         # Perform scaling normalization
-#         sc.pp.scale(adata)
-#
-#         # Extract the scaled data
-#         scaled_data <- adata$X
-#
-#         # Return the scaled data
-#         result <- scaled_data
-#     ''')
-#
-#     # Retrieve results back to Python
-#     scaled_data = robjects.globalenv['result']
-#
-#     # Update the data with the scaled values
-#     data.X = np.array(scaled_data)
-#
-#     return data
-#
-# normalizations =[total_count_normalization]
+    df_filtered.replace([np.inf, -np.inf], np.nan, inplace=True)
+    df_filtered.dropna(axis=1, how='all', inplace=True)
+
+    with robjects.conversion.localconverter(robjects.default_converter + pandas2ri.converter):
+        r_counts = robjects.conversion.py2rpy(df_filtered)
+
+    dge = edgeR.DGEList(counts=r_counts)
+    dge = edgeR.calcNormFactors(dge)
+    norm_factors = np.array(dge.rx2('samples').rx2('norm.factors'))
+
+    normalized_counts = df_filtered.div(norm_factors, axis=1)
+
+    return sc.AnnData(normalized_counts)
+
+# TMM, Linnorm, Scale, Scarn, Seurat
+# normalizations = [total_count_normalization, log_normalization, scale_normalization]
+normalizations = [tmm, seurat, log_normalization, scale]
+
+

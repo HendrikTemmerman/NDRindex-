@@ -1,9 +1,12 @@
+import copy
+
 import matplotlib.pyplot as plt
 from sklearn.datasets import make_blobs
 from scipy.spatial import distance
 from numpy.random import choice
 import numpy as np
 from sklearn.metrics import adjusted_rand_score
+from NDRindex import NDRindex
 
 
 # Function to simulate data similar to the provided image
@@ -41,14 +44,12 @@ fig, axs = plt.subplots(1, 4, figsize=(20, 6))
 # Display the datasets
 
 
-def NDRindexSimulation(data):
-
-    X = data[0]
-    y = data[1]
+def NDRindexSimulation(X):
 
 
     n, d = X.shape
-    M = np.median([distance.euclidean(X[i], X[j]) for i in range(len(X)) for j in range(i + 1, len(X))])
+    distances = distance.pdist(X, 'euclidean')
+    M = np.percentile(distances, 25)
 
 
     average_scale = M / np.log10(n)
@@ -58,9 +59,9 @@ def NDRindexSimulation(data):
 
     K = 1
     R = 0
-    random_point = choice(range(n))
-    Y[random_point] = K
-    gcenter[K] = X[random_point]
+    A = np.random.choice(range(n))
+    Y[A] = K
+    gcenter[K] = X[A]
 
     while np.any(Y == -1):  # While there are points not assigned to a cluster
         for j in range(n):
@@ -84,8 +85,9 @@ def NDRindexSimulation(data):
 
     R = R / K
     NDRindex = 1.0 - R / average_scale
-    print("NDRindex:", NDRindex)
-    print("ARI:", adjusted_rand_score(y, Y))
+    print(NDRindex)
+
+    #print("ARI:", adjusted_rand_score(y, Y))
     return NDRindex
 
 
@@ -100,4 +102,8 @@ plt.tight_layout()
 plt.show()
 
 for sd in simulated_datasets:
-    NDRindexSimulation(sd)
+    print("---------------")
+    c = copy.deepcopy(sd)
+    NDRindex(c[0])
+    print("and")
+    NDRindexSimulation(sd[0])
