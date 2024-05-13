@@ -17,7 +17,6 @@ Dataset 3: MD711 (4 cell types)
 
 """Dataset 1"""
 dataset1 = sc.read_10x_mtx("dataset1")
-tmm(dataset1)
 metadata1 = pd.read_csv("dataset1/metadata_v2.tsv", header=0, sep='\t').iloc[1:]
 dataset1_labels = metadata1["cell_type"]
 n_clusters1 = len(np.unique(dataset1_labels))

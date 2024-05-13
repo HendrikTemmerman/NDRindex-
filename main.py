@@ -42,6 +42,8 @@ def plot_data(data, NDRindex, name):
 
 counter = 1
 
+
+
 for dataset, true_labels, n_cell_types in datasets:
     data = {'Combination': [],
             'NDRindex': [],
@@ -79,31 +81,23 @@ for dataset, true_labels, n_cell_types in datasets:
                 else:
                     ndr_input = dense_matrix
 
-                # Agglomerative Clustering
-                hclust = AgglomerativeClustering(n_clusters=n_cell_types, linkage='ward')
-                cluster_labels = hclust.fit_predict(ndr_input)
+            # Agglomerative Clustering
+            hclust = AgglomerativeClustering(n_clusters=n_cell_types, linkage='ward')
+            cluster_labels = hclust.fit_predict(ndr_input)
 
-                # K-Means Clustering
-                kmeans = KMeans(n_clusters=n_cell_types, random_state=42)
-                kmeans_labels = kmeans.fit_predict(ndr_input)
+            # K-Means Clustering
+            kmeans = KMeans(n_clusters=n_cell_types, random_state=42)
+            kmeans_labels = kmeans.fit_predict(ndr_input)
 
-                # DBSCAN
-                dbscan = DBSCAN(eps=0.5, min_samples=5)
-                dbscan_labels = dbscan.fit_predict(ndr_input)
+            # DBSCAN
+            dbscan = DBSCAN(eps=0.5, min_samples=5)
+            dbscan_labels = dbscan.fit_predict(ndr_input)
 
-                # Spectral Clustering
-                spectral = SpectralClustering(n_clusters=n_cell_types, affinity='nearest_neighbors',
-                                              random_state=42)
-                spectral_labels = spectral.fit_predict(ndr_input)
+            # Spectral Clustering
+            spectral = SpectralClustering(n_clusters=n_cell_types, affinity='nearest_neighbors',
+                                          random_state=42)
+            spectral_labels = spectral.fit_predict(ndr_input)
 
-
-
-                """
-                #Ap_clust
-                af = AffinityPropagation(random_state=0)
-                af.fit(ndr_input)
-                af_labels = af.labels_
-                """
 
 
             data['Combination'].append(combination)

@@ -47,6 +47,7 @@ def tmm(data):
     norm_factors = np.array(dge.rx2('samples').rx2('norm.factors'))
 
     normalized_counts = df_filtered.div(norm_factors, axis=1)
+    print("Normalized")
 
     return sc.AnnData(normalized_counts)
 
@@ -108,7 +109,8 @@ def scran(data):
 """
 
 # TMM, Linnorm, Scale, Scarn, Seurat
-# normalizations = [total_count_normalization, log_normalization, scale_normalization]
 normalizations = [tmm, seurat, log_normalization, scale]
+normalizations = [log_normalization, scale]
+
 
 
