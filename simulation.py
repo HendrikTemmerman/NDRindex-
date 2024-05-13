@@ -104,6 +104,6 @@ plt.show()
 for sd in simulated_datasets:
     print("---------------")
     c = copy.deepcopy(sd)
-    NDRindex(c[0])
+    print(NDRindex(c[0]))
     print("and")
     NDRindexSimulation(sd[0])

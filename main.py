@@ -9,6 +9,38 @@ from DimensionalityReduction import dimension_reductions
 from sklearn.cluster import AgglomerativeClustering, KMeans, DBSCAN, SpectralClustering
 from sklearn.metrics import adjusted_rand_score
 from NDRindex import NDRindex
+import matplotlib.pyplot as plt
+from sklearn.cluster import AffinityPropagation
+from statistics import mean, median
+
+
+
+def plot_data(data, NDRindex, name):
+
+    left = [1, 2, 3, 4, 5]
+
+    ARI_NDRindex = NDRindex
+    ARI_average = mean(data)
+    ARI_median = median(data)
+    ARI_upper_quantile = np.quantile(data, 0.75)
+    ARI_max = max(data)
+
+    height = [ARI_NDRindex, ARI_average, ARI_median, ARI_upper_quantile, ARI_max]
+
+    tick_label = ['ARI of NDRindex', 'ARI average', 'ARI median', 'ARI upper quantile', 'ARI max']
+
+    plt.figure(figsize=(10, 6))
+    plt.bar(left, height, tick_label=tick_label,width=0.8, color=['red', 'green', 'blue', 'orange', 'purple'])
+    plt.ylabel('ARI')
+    plt.title(name)
+    plt.savefig(f'{name}.png')
+    plt.show()
+
+
+
+
+
+counter = 1
 
 for dataset, true_labels, n_cell_types in datasets:
     data = {'Combination': [],
@@ -64,12 +96,32 @@ for dataset, true_labels, n_cell_types in datasets:
                                               random_state=42)
                 spectral_labels = spectral.fit_predict(ndr_input)
 
+
+
+                """
+                #Ap_clust
+                af = AffinityPropagation(random_state=0)
+                af.fit(ndr_input)
+                af_labels = af.labels_
+                """
+
+
             data['Combination'].append(combination)
             data['NDRindex'].append(NDRindex(ndr_input))
             data['ARI-hclust'].append(adjusted_rand_score(true_labels, cluster_labels))
             data['ARI-kmeans'].append(adjusted_rand_score(true_labels, kmeans_labels))
             data['ARI-dbscan'].append(adjusted_rand_score(true_labels, dbscan_labels))
             data['ARI-spectral'].append(adjusted_rand_score(true_labels, spectral_labels))
+            #data['ARI-Ap_clust'].append(adjusted_rand_score(true_labels, af_labels))
+
 
     df = pd.DataFrame(data)
+    df.to_csv(f"data_{counter}/data")
+    highest_NDRindex = df['NDRindex'].idxmax()
+    print("the highest NDR index",highest_NDRindex)
+    plot_data(data['ARI-hclust'], df.at[highest_NDRindex, 'ARI-hclust'],f"data_{counter}/hclust")
+    plot_data(data['ARI-kmeans'], df.at[highest_NDRindex, 'ARI-kmeans'],f"data_{counter}/kmeans")
+    plot_data(data['ARI-dbscan'], df.at[highest_NDRindex, 'ARI-dbscan'],f"data_{counter}/dbscan")
+    plot_data(data['ARI-spectral'], df.at[highest_NDRindex, 'ARI-spectral'],f"data_{counter}/spectral")
+    counter = counter + 1
     print(df)
