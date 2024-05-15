@@ -6,7 +6,7 @@ from scipy.spatial import distance
 from numpy.random import choice
 import numpy as np
 from sklearn.metrics import adjusted_rand_score
-from NDRindex import NDRindex
+from ndr_index import NDRindex
 
 
 # Function to simulate data similar to the provided image
@@ -31,7 +31,7 @@ def simulate_data(centers, cluster_std, n_samples, random_state):
 
 # Parameters for the datasets
 centers = [[1, 1], [1, 9], [9, 1], [9, 9]]
-cluster_std = [0.15, 0.5, 0.75, 1.5]
+cluster_std = [0.15, 0.5, 0.9, 1.5]
 n_samples = 500
 random_state = 42
 
@@ -41,54 +41,7 @@ simulated_datasets = [simulate_data(centers, std, n_samples, random_state) for s
 # Plotting the simulated datasets
 fig, axs = plt.subplots(1, 4, figsize=(20, 6))
 
-# Display the datasets
 
-
-def NDRindexSimulation(X):
-
-
-    n, d = X.shape
-    distances = distance.pdist(X, 'euclidean')
-    M = np.percentile(distances, 25)
-
-
-    average_scale = M / np.log10(n)
-    # Initialize clusters
-    gcenter = {}
-    Y = np.full(n, -1)  # Cluster assignments
-
-    K = 1
-    R = 0
-    A = np.random.choice(range(n))
-    Y[A] = K
-    gcenter[K] = X[A]
-
-    while np.any(Y == -1):  # While there are points not assigned to a cluster
-        for j in range(n):
-            if Y[j] == -1:  # If point j is not assigned to a cluster
-                distances_to_centers = [distance.euclidean(gcenter[k], X[j]) for k in gcenter]
-                nearest_cluster = np.argmin(distances_to_centers) + 1
-                if distances_to_centers[nearest_cluster - 1] < average_scale:
-                    Y[j] = nearest_cluster
-                    cluster_points = X[Y == nearest_cluster]
-                    gcenter[nearest_cluster] = np.mean(cluster_points, axis=0)
-                else:
-                    K += 1
-                    Y[j] = K
-                    gcenter[K] = X[j]
-
-    # Calculate NDRindex
-    for k in gcenter:
-        cluster_points = X[Y == k]
-        R += sum([distance.euclidean(gcenter[k], p) for p in cluster_points]) / len(cluster_points)
-
-
-    R = R / K
-    NDRindex = 1.0 - R / average_scale
-    print(NDRindex)
-
-    #print("ARI:", adjusted_rand_score(y, Y))
-    return NDRindex
 
 
 
@@ -101,9 +54,34 @@ for i, (X, y) in enumerate(simulated_datasets):
 plt.tight_layout()
 plt.show()
 
-for sd in simulated_datasets:
-    print("---------------")
-    c = copy.deepcopy(sd)
-    print(NDRindex(c[0]))
-    print("and")
-    NDRindexSimulation(sd[0])
+n = 10
+ndr_values = np.zeros(len(simulated_datasets))
+for i in range(n):
+    print(f"Run {i + 1}")
+    for sd in range(len(simulated_datasets)):
+        dataset = simulated_datasets[sd]
+        c = copy.deepcopy(dataset)
+        ndr_index = NDRindex(c[0])
+        ndr_values[sd] += ndr_index
+
+ndr_values = ndr_values/n
+
+datasets = ['Simulated Dataset 1', 'Simulated Dataset 2', 'Simulated Dataset 3', 'Simulated Dataset 4']
+
+# Plotting the NDRindex values
+plt.figure(figsize=(10, 6))
+plt.plot(datasets, ndr_values, marker='o', linestyle='-', color='skyblue', linewidth=2, markersize=8)
+
+# Adding titles and labels
+plt.title('NDRindex Values for Different Datasets')
+plt.xlabel('Datasets')
+plt.ylabel('NDRindex Value')
+
+# Adding the values on top of the points
+for i, value in enumerate(ndr_values):
+    plt.text(i, value + 0.01, str(value), ha='center', va='bottom')
+
+# Display the plot
+plt.ylim(0, 1)  # Set y-axis limit to better visualize the values
+plt.grid(True)
+plt.show()

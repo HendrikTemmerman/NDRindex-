@@ -110,6 +110,6 @@ def scran(data):
 
 # TMM, Linnorm, Scale, Scarn, Seurat
 normalizations = [tmm, seurat, log_normalization, scale]
-
+#normalizations = [scale, log_normalization]
 
 

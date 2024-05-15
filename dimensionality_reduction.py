@@ -32,4 +32,5 @@ def diffmap(data):
     print("Reduced by diffmap:", data.obsm["X_diffmap"].shape)
 
 dimension_reductions = [pca, tsne, umap, diffmap]
+#dimension_reductions = [umap]
 

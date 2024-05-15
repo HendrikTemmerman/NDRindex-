@@ -36,3 +36,5 @@ A vector of tulps with as elements the dataset and the labels
 datasets = [(dataset1, dataset1_labels, n_clusters1),
             (dataset2, dataset2_labels, n_clusters2),
             (dataset3, dataset3_labels, n_clusters3)]
+
+print("Datasets loaded")

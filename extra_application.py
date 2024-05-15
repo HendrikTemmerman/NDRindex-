@@ -3,11 +3,11 @@ import numpy as np
 import scanpy as sc
 from scipy.io import arff
 from anndata import AnnData
-from Normalization import normalizations
-from DimensionalityReduction import dimension_reductions
+from normalisation import normalizations
+from dimensionality_reduction import dimension_reductions
 from sklearn.cluster import AgglomerativeClustering, KMeans, DBSCAN, SpectralClustering
 from sklearn.metrics import adjusted_rand_score
-from NDRindex import NDRindex
+from ndr_index import NDRindex
 
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -69,10 +69,6 @@ for normalize in normalizations:
         kmeans = KMeans(n_clusters=n_responses, random_state=42)
         kmeans_labels = kmeans.fit_predict(ndr_input)
 
-        # DBSCAN
-        dbscan = DBSCAN(eps=0.5, min_samples=5)
-        dbscan_labels = dbscan.fit_predict(ndr_input)
-        print(dbscan_labels)
 
         # Spectral Clustering
         spectral = SpectralClustering(n_clusters=n_responses, affinity='nearest_neighbors',
