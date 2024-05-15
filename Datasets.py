@@ -1,12 +1,7 @@
 import scanpy as sc
 import pandas as pd
 import numpy as np
-from Normalization import tmm
 
-
-import rpy2.robjects as robjects
-from rpy2.robjects import pandas2ri
-from rpy2.robjects.packages import importr
 
 
 """

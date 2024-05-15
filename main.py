@@ -15,26 +15,54 @@ from statistics import mean, median
 
 
 
-def plot_data(data, NDRindex, name):
 
-    left = [1, 2, 3, 4, 5]
 
-    ARI_NDRindex = NDRindex
-    ARI_average = mean(data)
-    ARI_median = median(data)
-    ARI_upper_quantile = np.quantile(data, 0.75)
-    ARI_max = max(data)
 
-    height = [ARI_NDRindex, ARI_average, ARI_median, ARI_upper_quantile, ARI_max]
+def plot_datasets(datasets):
+    Clusternames = ['ARI-hclust', 'ARI-kmeans', 'ARI-dbscan', 'ARI-spectral']
 
-    tick_label = ['ARI of NDRindex', 'ARI average', 'ARI median', 'ARI upper quantile', 'ARI max']
+    for Cluster_name in Clusternames:
+        ARI_NDRindex = []
+        ARI_average = []
+        ARI_median = []
+        ARI_upper_quantile = []
+        ARI_max = []
 
-    plt.figure(figsize=(10, 6))
-    plt.bar(left, height, tick_label=tick_label,width=0.8, color=['red', 'green', 'blue', 'orange', 'purple'])
-    plt.ylabel('ARI')
-    plt.title(name)
-    plt.savefig(f'{name}.png')
-    plt.show()
+        for data in datasets:
+            ARI_cluster = data[Cluster_name]
+            highest_NDRindex = data['NDRindex'].idxmax()
+
+
+            NDR = data.at[highest_NDRindex, Cluster_name]
+            average = mean(ARI_cluster)
+            median_value = median(ARI_cluster)
+            upper_quantile = np.quantile(ARI_cluster, 0.75)
+            max_value = max(ARI_cluster)
+
+            ARI_NDRindex.append(NDR)
+            ARI_average.append(average)
+            ARI_median.append(median_value)
+            ARI_upper_quantile.append(upper_quantile)
+            ARI_max.append(max_value)
+
+        bar_width = 0.15
+        x = np.arange(len(datasets))
+        fig, ax = plt.subplots()
+
+        ax.bar(x - bar_width * 2, ARI_NDRindex, width=bar_width, label='NDR Index', color='r')
+        ax.bar(x - bar_width, ARI_average, width=bar_width, label='Average', color='g')
+        ax.bar(x, ARI_median, width=bar_width, label='Median', color='b')
+        ax.bar(x + bar_width, ARI_upper_quantile, width=bar_width, label='75th Quantile', color='y')
+        ax.bar(x + bar_width * 2, ARI_max, width=bar_width, label='Max', color='purple')
+
+        ax.set_ylabel('ARI')
+        ax.set_title(f'{Cluster_name}')
+        ax.set_xticks(x)
+        ax.set_xticklabels([f'Dataset {i+1}' for i in range(len(datasets))])
+        ax.legend()
+
+        plt.savefig(f'{Cluster_name}.png')
+        plt.show()
 
 
 
@@ -43,6 +71,7 @@ def plot_data(data, NDRindex, name):
 counter = 1
 
 
+data_from_all_datasets = []
 
 for dataset, true_labels, n_cell_types in datasets:
     data = {'Combination': [],
@@ -94,8 +123,7 @@ for dataset, true_labels, n_cell_types in datasets:
             dbscan_labels = dbscan.fit_predict(ndr_input)
 
             # Spectral Clustering
-            spectral = SpectralClustering(n_clusters=n_cell_types, affinity='nearest_neighbors',
-                                          random_state=42)
+            spectral = SpectralClustering(n_clusters=n_cell_types, affinity='nearest_neighbors', random_state=42)
             spectral_labels = spectral.fit_predict(ndr_input)
 
 
@@ -110,12 +138,8 @@ for dataset, true_labels, n_cell_types in datasets:
 
 
     df = pd.DataFrame(data)
-    df.to_csv(f"data_{counter}/data")
-    highest_NDRindex = df['NDRindex'].idxmax()
-    print("the highest NDR index",highest_NDRindex)
-    plot_data(data['ARI-hclust'], df.at[highest_NDRindex, 'ARI-hclust'],f"data_{counter}/hclust")
-    plot_data(data['ARI-kmeans'], df.at[highest_NDRindex, 'ARI-kmeans'],f"data_{counter}/kmeans")
-    plot_data(data['ARI-dbscan'], df.at[highest_NDRindex, 'ARI-dbscan'],f"data_{counter}/dbscan")
-    plot_data(data['ARI-spectral'], df.at[highest_NDRindex, 'ARI-spectral'],f"data_{counter}/spectral")
+    data_from_all_datasets.append(df)
+    df.to_csv(f'data_{counter}.csv', index=False)
     counter = counter + 1
-    print(df)
+
+plot_datasets(data_from_all_datasets)
