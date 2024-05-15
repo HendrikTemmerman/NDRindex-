@@ -12,7 +12,7 @@ from ndr_index import NDRindex
 import matplotlib.pyplot as plt
 from statistics import mean, median
 
-LOAD_DATA = True
+LOAD_DATA = False
 
 
 def plot_datasets(datasets):

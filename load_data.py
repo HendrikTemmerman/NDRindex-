@@ -31,7 +31,7 @@ n_clusters3 = len(np.unique(dataset3_labels))
 
 """
 Datasets
-A vector of tulps with as elements the dataset and the labels
+A vector of tuples with as elements the dataset and the labels
 """
 datasets = [(dataset1, dataset1_labels, n_clusters1),
             (dataset2, dataset2_labels, n_clusters2),
