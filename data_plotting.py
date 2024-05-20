@@ -5,7 +5,7 @@ import pandas as pd
 
 
 def plot_datasets(datasets):
-    cluster_algorithms = ['ARI-hclust', 'ARI-kmeans', 'ARI-spectral', 'ARI-ap_clust']
+    cluster_algorithms = ['ARI-hclust', 'ARI-kmeans', 'ARI-spectral']
 
     for cluster_algorithm in cluster_algorithms:
         ARI_NDRindex = []
@@ -32,20 +32,23 @@ def plot_datasets(datasets):
 
 
 def plot_correlation_ARI_RNA(datasets):
-    cluster_algorithms = ['ARI-hclust', 'ARI-kmeans', 'ARI-spectral', 'ARI-ap_clust']
+    cluster_algorithms = ['ARI-hclust', 'ARI-kmeans', 'ARI-spectral']
+    colors = ['red', 'blue', 'green']  # Different colors for each algorithm
 
-    for cluster_algorithm in cluster_algorithms:
-        for i, data in enumerate(datasets):
+    for i, data in enumerate(datasets):
+        fig = plt.figure(figsize=(7, 5))
+        ax = fig.add_axes([0.1, 0.1, 0.8, 0.8])
+
+        for j, cluster_algorithm in enumerate(cluster_algorithms):
             ARIs = data[cluster_algorithm]
             NDR = data['NDRindex']
-            fig = plt.figure(figsize=(7, 5))
-            ax = fig.add_axes([0.1, 0.1, 0.8, 0.8])
-            ax.scatter(NDR, ARIs, color='red', marker='o', label='ARI vs NDRindex', zorder=3)
-            ax.set_xlabel('NDRindex')
-            ax.set_ylabel('ARI')
-            ax.set_title(f'{cluster_algorithm} - Dataset {i + 1}')
-            ax.legend(loc='upper right')
-            plt.savefig(f'correlation_ari_ndr/Dataset {i + 1}-{cluster_algorithm}.png')
+            ax.scatter(NDR, ARIs, color=colors[j], marker='o', label=cluster_algorithm, zorder=3)
+
+        ax.set_xlabel('NDRindex')
+        ax.set_ylabel('ARI')
+        ax.set_title(f'Correlation of ARI with NDRindex - Dataset {i + 1}')
+        ax.legend(loc='upper right')
+        plt.savefig(f'correlation_ari_ndr/Dataset_{i + 1}.png')
 
 
 

@@ -11,27 +11,23 @@ from sklearn.metrics import adjusted_rand_score
 from ndr_index import NDRindex
 import matplotlib.pyplot as plt
 from statistics import mean, median
-from data_plotting import plot_datasets
+from data_plotting import plot_correlation_ARI_RNA
 
 LOAD_DATA = True
 data_from_all_datasets = []
 
 
-def clustering(data, ndr_input, true_labels, n_cell_types, combination):
+def clustering(data, ndr_input, true_labels, n_cell_types, combination, state):
     # Agglomerative Clustering
     hclust = AgglomerativeClustering(n_clusters=n_cell_types, linkage='ward')
     cluster_labels = hclust.fit_predict(ndr_input)
 
     # K-Means Clustering
-    kmeans = KMeans(n_clusters=n_cell_types, random_state=42)
+    kmeans = KMeans(n_clusters=n_cell_types, random_state=state)
     kmeans_labels = kmeans.fit_predict(ndr_input)
 
-    # Affinity Propagation
-    af = AffinityPropagation(random_state=0, max_iter=1000, damping=0.99)
-    af_labels = af.fit_predict(ndr_input)
-
     # Spectral Clustering
-    spectral = SpectralClustering(n_clusters=n_cell_types, affinity='nearest_neighbors', random_state=42)
+    spectral = SpectralClustering(n_clusters=n_cell_types, affinity='nearest_neighbors', random_state=state)
     spectral_labels = spectral.fit_predict(ndr_input)
 
     data['Combination'].append(combination)
@@ -39,27 +35,24 @@ def clustering(data, ndr_input, true_labels, n_cell_types, combination):
     data['ARI-hclust'].append(adjusted_rand_score(true_labels, cluster_labels))
     data['ARI-kmeans'].append(adjusted_rand_score(true_labels, kmeans_labels))
     data['ARI-spectral'].append(adjusted_rand_score(true_labels, spectral_labels))
-    data['ARI-ap_clust'].append(adjusted_rand_score(true_labels, af_labels))
 
 
 
 def pipeline(number_of_times):
-    for time in range(number_of_times):
-        dataset_counter = 1
-        for dataset, true_labels, n_cell_types in datasets:
+    dataset_counter = 1
+    for dataset, true_labels, n_cell_types in datasets:
+        df_list = []
+        for run in range(1, number_of_times):
+            print(f"Run number {run} for dataset {dataset_counter}")
             data = {'Combination': [],
                     'NDRindex': [],
                     'ARI-hclust': [],
                     'ARI-kmeans': [],
-                    'ARI-spectral': [],
-                    'ARI-ap_clust': []}
+                    'ARI-spectral': []}
             for normalize in normalizations:
                 for reduce_dimension in dimension_reductions:
-                    print("--------------------------------")
                     combination = str(normalize.__name__) + "+" + str(reduce_dimension.__name__)
-                    print(combination)
                     if LOAD_DATA == True:
-                        print("it's true")
                         df = pd.read_csv(f'preprocessed/{str(dataset_counter) + "+" + combination}.csv')
                         ndr_input = df.to_numpy()
                     else:
@@ -77,8 +70,6 @@ def pipeline(number_of_times):
                         else:
                             dense_matrix = data_matrix.toarray()
 
-                        # Now, if you have already performed some dimensionality reduction and it is stored in .obsm
-                        # For example, if you have PCA results in .obsm['X_pca']
                         dimension_reduction_method = reduce_dimension.__name__
                         for col in adata.obsm.keys():
                             if dimension_reduction_method in col:
@@ -88,14 +79,20 @@ def pipeline(number_of_times):
                                 ndr_input = dense_matrix
 
                         df = pd.DataFrame(ndr_input)
-                        df.to_csv(f'test_preprocessed/{str(dataset_counter) + "+" + combination + "- " + str(time)}.csv', index=False)
+                        df.to_csv(f'preprocessed/{str(dataset_counter) + "+" + combination + "- " + str(run)}.csv', index=False)
 
-                    clustering(data, ndr_input, true_labels, n_cell_types, combination)
+                    clustering(data, ndr_input, true_labels, n_cell_types, combination, run+dataset_counter)
 
-            df = pd.DataFrame(data)
-            data_from_all_datasets.append(df)
-            df.to_csv(f'ari_data/data_{dataset_counter}.csv', index=False)
-            dataset_counter += 1
+            df_run = pd.DataFrame(data)
+            df_list.append(df_run)
 
-pipeline(1)
+        df_combined = pd.concat(df_list)
+        df_total = df_combined.groupby('Combination').mean().reset_index()
+
+        data_from_all_datasets.append(df_total)
+        df_total.to_csv(f'output_dataframes/data_{dataset_counter}.csv', index=False)
+        dataset_counter += 1
+
+pipeline(51)
+#plot_correlation_ARI_RNA(data_from_all_datasets)
 #plot_datasets(data_from_all_datasets)

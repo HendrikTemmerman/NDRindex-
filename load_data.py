@@ -6,7 +6,7 @@ import numpy as np
 
 """
 Dataset 1: MD704 (4 cell types)
-Dataset 2: MD710 (3 cell types)
+Dataset 2:  Single nuclei dataset, HPF (MD719) 
 Dataset 3: MD711 (4 cell types)
 """
 
