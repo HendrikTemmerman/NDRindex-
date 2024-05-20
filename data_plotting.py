@@ -48,7 +48,7 @@ def plot_correlation_ARI_RNA(datasets):
         ax.set_ylabel('ARI')
         ax.set_title(f'Correlation of ARI with NDRindex - Dataset {i + 1}')
         ax.legend(loc='upper right')
-        plt.savefig(f'correlation_ari_ndr/Dataset_{i + 1}.png')
+        plt.savefig(f'correlation_ari_ndr/correlation_ndr_ari_dataset{i + 1}.png')
 
 
 
@@ -64,10 +64,10 @@ def plot_correlation_combination_NDR(datasets):
         ax.set_title(f'Dataset{i + 1}')
         plt.savefig(f'correlation_combination_ndr/Dataset {i + 1}.png')
 
-#data1 = pd.read_csv('ari_data/data_1.csv')
-#data2 = pd.read_csv('ari_data/data_2.csv')
-#data3 = pd.read_csv('ari_data/data_3.csv')
-#datasets = [data1, data2, data3]
-#plot_datasets(datasets)
-#plot_correlation_ARI_RNA(datasets)
-#plot_correlation_combination_NDR(datasets)
+data1 = pd.read_csv('output_dataframes/data_1.csv')
+data2 = pd.read_csv('output_dataframes/data_2.csv')
+data3 = pd.read_csv('output_dataframes/data_3.csv')
+datasets = [data1, data2, data3]
+plot_datasets(datasets)
+plot_correlation_ARI_RNA(datasets)
+plot_correlation_combination_NDR(datasets)

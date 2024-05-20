@@ -3,7 +3,7 @@ import copy as cp
 import numpy as np
 import pandas as pd
 
-from load_data import datasets
+#from load_data import datasets
 from normalisation import normalizations
 from dimensionality_reduction import dimension_reductions
 from sklearn.cluster import AgglomerativeClustering, KMeans, SpectralClustering, AffinityPropagation
@@ -37,6 +37,34 @@ def clustering(data, ndr_input, true_labels, n_cell_types, combination, state):
     data['ARI-spectral'].append(adjusted_rand_score(true_labels, spectral_labels))
 
 
+def pre_process_data(dataset, normalize, reduce_dimension, dataset_counter, combination, run):
+    adata = cp.deepcopy(dataset)
+    adata = normalize(adata)
+    sc.pp.neighbors(adata, use_rep='X')
+    reduce_dimension(adata)
+
+    # If you just want the raw data matrix (genes x cells)
+    data_matrix = adata.X
+
+    # If the data matrix is sparse, convert it to a dense format
+    if isinstance(data_matrix, np.ndarray):
+        dense_matrix = data_matrix
+    else:
+        dense_matrix = data_matrix.toarray()
+
+    dimension_reduction_method = reduce_dimension.__name__
+    for col in adata.obsm.keys():
+        if dimension_reduction_method in col:
+            reduced_data_matrix = adata.obsm[col]
+            ndr_input = reduced_data_matrix
+        else:
+            ndr_input = dense_matrix
+
+    df = pd.DataFrame(ndr_input)
+    df.to_csv(f'preprocessed/{str(dataset_counter) + "+" + combination + "- " + str(run)}.csv', index=False)
+
+    return ndr_input
+
 
 def pipeline(number_of_times):
     dataset_counter = 1
@@ -44,44 +72,18 @@ def pipeline(number_of_times):
         df_list = []
         for run in range(1, number_of_times):
             print(f"Run number {run} for dataset {dataset_counter}")
-            data = {'Combination': [],
-                    'NDRindex': [],
-                    'ARI-hclust': [],
-                    'ARI-kmeans': [],
-                    'ARI-spectral': []}
+            data = {'Combination': [], 'NDRindex': [], 'ARI-hclust': [], 'ARI-kmeans': [], 'ARI-spectral': []}
             for normalize in normalizations:
                 for reduce_dimension in dimension_reductions:
                     combination = str(normalize.__name__) + "+" + str(reduce_dimension.__name__)
-                    if LOAD_DATA == True:
+                    if LOAD_DATA:
                         df = pd.read_csv(f'preprocessed/{str(dataset_counter) + "+" + combination}.csv')
                         ndr_input = df.to_numpy()
                     else:
-                        adata = cp.deepcopy(dataset)
-                        adata = normalize(adata)
-                        sc.pp.neighbors(adata, use_rep='X')
-                        reduce_dimension(adata)
+                        ndr_input = pre_process_data(dataset, normalize, reduce_dimension, dataset_counter, combination,
+                                                     run)
 
-                        # If you just want the raw data matrix (genes x cells)
-                        data_matrix = adata.X
-
-                        # If the data matrix is sparse, convert it to a dense format
-                        if isinstance(data_matrix, np.ndarray):
-                            dense_matrix = data_matrix
-                        else:
-                            dense_matrix = data_matrix.toarray()
-
-                        dimension_reduction_method = reduce_dimension.__name__
-                        for col in adata.obsm.keys():
-                            if dimension_reduction_method in col:
-                                reduced_data_matrix = adata.obsm[col]
-                                ndr_input = reduced_data_matrix
-                            else:
-                                ndr_input = dense_matrix
-
-                        df = pd.DataFrame(ndr_input)
-                        df.to_csv(f'preprocessed/{str(dataset_counter) + "+" + combination + "- " + str(run)}.csv', index=False)
-
-                    clustering(data, ndr_input, true_labels, n_cell_types, combination, run+dataset_counter)
+                    clustering(data, ndr_input, true_labels, n_cell_types, combination, run + dataset_counter)
 
             df_run = pd.DataFrame(data)
             df_list.append(df_run)
@@ -93,6 +95,5 @@ def pipeline(number_of_times):
         df_total.to_csv(f'output_dataframes/data_{dataset_counter}.csv', index=False)
         dataset_counter += 1
 
-pipeline(51)
-#plot_correlation_ARI_RNA(data_from_all_datasets)
-#plot_datasets(data_from_all_datasets)
+
+# pipeline(51)
