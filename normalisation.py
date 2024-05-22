@@ -6,7 +6,7 @@ import rpy2.robjects as robjects
 from rpy2.robjects import pandas2ri
 from rpy2.robjects.packages import importr
 
-def seurat(data):
+def total(data):
     sc.pp.normalize_total(data, target_sum=1e4)
     print("Normalized")
     return data
@@ -43,7 +43,7 @@ def tmm(data):
         r_counts = robjects.conversion.py2rpy(df_filtered)
 
     dge = edgeR.DGEList(counts=r_counts)
-    dge = edgeR.calcNormFactors(dge)
+    dge = edgeR.calcNormFactors(dge, method="TMM")
     norm_factors = np.array(dge.rx2('samples').rx2('norm.factors'))
 
     normalized_counts = df_filtered.div(norm_factors, axis=1)
@@ -53,4 +53,4 @@ def tmm(data):
 
 
 # TMM, Linnorm, Scale, Scarn, Seurat
-normalizations = [tmm, seurat, log_normalization, scale]
+normalizations = [tmm, total, log_normalization, scale]

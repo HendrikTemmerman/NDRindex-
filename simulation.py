@@ -38,7 +38,7 @@ for i, (X, y) in enumerate(simulated_datasets):
 plt.tight_layout()
 plt.show()
 
-n = 10
+n = 51
 ndr_values = np.zeros(len(simulated_datasets))
 for i in range(n):
     print(f"Run {i + 1}")
@@ -52,20 +52,26 @@ ndr_values = ndr_values/n
 
 datasets = ['Simulated Dataset 1', 'Simulated Dataset 2', 'Simulated Dataset 3', 'Simulated Dataset 4']
 
-# Plotting the NDRindex values
 plt.figure(figsize=(10, 6))
-plt.plot(datasets, ndr_values, marker='o', linestyle='-', color='skyblue', linewidth=2, markersize=8)
+plt.plot(datasets, ndr_values, marker='o', linestyle='-', color='b', markersize=8, linewidth=2)
 
-# Adding titles and labels
-plt.title('NDRindex Values for Different Datasets')
-plt.xlabel('Datasets')
-plt.ylabel('NDRindex Value')
+# Add titles and labels
+plt.title('NDRindex Evolution of Simulated Datasets', fontsize=16, fontweight='bold')
+plt.xlabel('Dataset', fontsize=14)
+plt.ylabel('NDRindex', fontsize=14)
 
-# Adding the values on top of the points
+# Add grid for better readability
+plt.grid(True, linestyle='--', alpha=0.7)
+
+# Customize tick parameters for better readability
+plt.xticks(fontsize=12, rotation=15)
+plt.yticks(fontsize=12)
+
+# Annotate values next to the points
 for i, value in enumerate(ndr_values):
-    plt.text(i, value + 0.01, str(value), ha='center', va='bottom')
+    plt.annotate(f'{value:.2f}', (datasets[i], ndr_values[i]), textcoords="offset points", xytext=(0,10), ha='center', fontsize=12)
 
-# Display the plot
-plt.ylim(0, 1)  # Set y-axis limit to better visualize the values
-plt.grid(True)
+# Show the plot
+plt.tight_layout()
 plt.show()
+
