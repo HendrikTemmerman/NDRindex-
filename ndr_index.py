@@ -1,5 +1,13 @@
 from scipy.spatial import distance
+import anndata as ad
+import scanpy as sc
+
 import numpy as np
+import pandas as pd
+import sc3s
+from sklearn.metrics import adjusted_rand_score
+
+from load_data import datasets
 
 count = 0
 
@@ -25,7 +33,8 @@ def NDRindex(data):
 
         for j in range(n):
             point = data[j]
-            if Y[j] == -1 and distance.euclidean(geometric_centers[K], point) < distance.euclidean(geometric_centers[K], B):
+            if Y[j] == -1 and distance.euclidean(geometric_centers[K], point) < distance.euclidean(geometric_centers[K],
+                                                                                                   B):
                 B = point
                 B_index = j
 
@@ -53,4 +62,6 @@ def NDRindex(data):
     return NDRindex
 
 
-
+def SC3(adata, true_labels, n_cell_types):
+    sc3s.tl.consensus(adata, n_clusters=n_cell_types)
+    return adjusted_rand_score(true_labels, adata.obs[f'sc3s_{n_cell_types}'])

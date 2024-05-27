@@ -3,17 +3,17 @@ import copy as cp
 import numpy as np
 import pandas as pd
 
-#from load_data import datasets
+from load_data import datasets
 from normalisation import normalizations
 from dimensionality_reduction import dimension_reductions
 from sklearn.cluster import AgglomerativeClustering, KMeans, SpectralClustering, AffinityPropagation
 from sklearn.metrics import adjusted_rand_score
-from ndr_index import NDRindex
+from ndr_index import NDRindex, SC3
 import matplotlib.pyplot as plt
 from statistics import mean, median
 from data_plotting import plot_correlation_ARI_RNA
 
-LOAD_DATA = True
+LOAD_DATA = False
 data_from_all_datasets = []
 
 
@@ -37,7 +37,7 @@ def clustering(data, ndr_input, true_labels, n_cell_types, combination, state):
     data['ARI-spectral'].append(adjusted_rand_score(true_labels, spectral_labels))
 
 
-def pre_process_data(dataset, normalize, reduce_dimension, dataset_counter, combination, run):
+def pre_process_data(dataset, normalize, reduce_dimension, dataset_counter, combination, run, n_cell_types):
     adata = cp.deepcopy(dataset)
     adata = normalize(adata)
     sc.pp.neighbors(adata, use_rep='X')
@@ -73,6 +73,7 @@ def pipeline(number_of_times):
         for run in range(1, number_of_times):
             print(f"Run number {run} for dataset {dataset_counter}")
             data = {'Combination': [], 'NDRindex': [], 'ARI-hclust': [], 'ARI-kmeans': [], 'ARI-spectral': []}
+            data = {'Combination': [], 'SC3-ARI': []}
             for normalize in normalizations:
                 for reduce_dimension in dimension_reductions:
                     combination = str(normalize.__name__) + "+" + str(reduce_dimension.__name__)
@@ -80,10 +81,17 @@ def pipeline(number_of_times):
                         df = pd.read_csv(f'preprocessed/{str(dataset_counter) + "+" + combination}.csv')
                         ndr_input = df.to_numpy()
                     else:
-                        ndr_input = pre_process_data(dataset, normalize, reduce_dimension, dataset_counter, combination,
-                                                     run)
+                        adata = cp.deepcopy(dataset)
+                        adata = normalize(adata)
+                        sc.pp.neighbors(adata, use_rep='X')
+                        reduce_dimension(adata)
 
-                    clustering(data, ndr_input, true_labels, n_cell_types, combination, run + dataset_counter)
+
+                        #ndr_input = pre_process_data(dataset, normalize, reduce_dimension, dataset_counter, combination, run)
+
+                    #clustering(data, ndr_input, true_labels, n_cell_types, combination, run + dataset_counter)
+                    data['Combination'].append(combination)
+                    data['SC3-ARI'].append(SC3(adata, true_labels, n_cell_types))
 
             df_run = pd.DataFrame(data)
             df_list.append(df_run)
@@ -92,8 +100,8 @@ def pipeline(number_of_times):
         df_total = df_combined.groupby('Combination').mean().reset_index()
 
         data_from_all_datasets.append(df_total)
-        df_total.to_csv(f'output_dataframes/data_{dataset_counter}.csv', index=False)
+        df_total.to_csv(f'output_sc3/data_{dataset_counter}.csv', index=False)
         dataset_counter += 1
 
 
-# pipeline(51)
+pipeline(51)

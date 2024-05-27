@@ -64,10 +64,43 @@ def plot_correlation_combination_NDR(datasets):
         ax.set_title(f'Dataset{i + 1}')
         plt.savefig(f'correlation_combination_ndr/Dataset {i + 1}.png')
 
+
+def plot_combined_datasets_by_algorithm(datasets):
+    cluster_algorithms = ['ARI-hclust', 'ARI-kmeans', 'ARI-spectral']
+    dataset_labels = [f'Dataset {i + 1}' for i in range(len(datasets))]
+
+    fig, axs = plt.subplots(1, 3, figsize=(21, 7))
+
+    for i, (data, ax) in enumerate(zip(datasets, axs)):
+        ARI_NDRindex = []
+        ARI_data = []
+
+        for cluster_algorithm in cluster_algorithms:
+            ARI_cluster = data[cluster_algorithm]
+            highest_NDRindex = data['NDRindex'].idxmax()
+            NDR = data.at[highest_NDRindex, cluster_algorithm]
+            ARI_NDRindex.append(NDR)
+            ARI_data.append(ARI_cluster)
+
+        ax.boxplot(ARI_data)
+        ax.set_xlabel('Clustering Algorithms')
+        ax.set_ylabel('ARI')
+        ax.set_title(f'Results for {dataset_labels[i]}')
+        ax.set_xticklabels(cluster_algorithms)
+        for j in range(len(ARI_data)):
+            ax.scatter(j + 1, ARI_NDRindex[j], color='red', zorder=3, label='ARI of NDRindex choose' if j == 0 else "")
+        ax.legend(loc='upper center', bbox_to_anchor=(0.5, 0.95), ncol=1)
+
+    plt.tight_layout()
+    plt.savefig('ari_boxplots/combined_datasets.png')
+
+
 data1 = pd.read_csv('output_dataframes/data_1.csv')
 data2 = pd.read_csv('output_dataframes/data_2.csv')
 data3 = pd.read_csv('output_dataframes/data_3.csv')
 datasets = [data1, data2, data3]
-plot_datasets(datasets)
-plot_correlation_ARI_RNA(datasets)
-plot_correlation_combination_NDR(datasets)
+plot_combined_datasets_by_algorithm(datasets)
+
+#plot_datasets(datasets)
+#plot_correlation_ARI_RNA(datasets)
+#plot_correlation_combination_NDR(datasets)

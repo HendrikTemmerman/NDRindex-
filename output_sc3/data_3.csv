@@ -1,0 +1,5 @@
+Combination,SC3-ARI
+log_normalization+pca,0.16998641290962843
+scale+pca,0.46936270684092063
+tmm+pca,0.03163494059020636
+total+pca,0.0333568782839852
