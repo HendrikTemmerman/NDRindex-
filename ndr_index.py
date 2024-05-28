@@ -1,43 +1,51 @@
 from scipy.spatial import distance
-import anndata as ad
-import scanpy as sc
-
 import numpy as np
-import pandas as pd
-import sc3s
-from sklearn.metrics import adjusted_rand_score
+#import sc3s
 
-from load_data import datasets
-
-count = 0
+"""
+NDRindex (Normalization and Dimensionality Reduction index)
+The function NDRindex takes as input a preprocessed data.
+The NDRindex compute a score for the preprocessed data. 
+This score should indicate the quality of the preprocessed data.
+"""
 
 
 def NDRindex(data):
+
+    # Let n and d be the shape of the data.
     n, d = data.shape
+
+    # Random index of a point
     A = np.random.choice(range(n))
 
+    # Let K be equal to the index of a cluster.
     K = 1
-
     Y = np.full(n, -1)
     Y[A] = K
+
+    # Geometric centers of the clusters.
     geometric_centers = {K: data[A]}
 
+    # Calculate the average scale of the dataset.
     distances = distance.pdist(data, 'euclidean')
     M = np.percentile(distances, 25)
-
     average_scale = M / np.log10(n)
 
+    # If there are data points that have not yet been assigned to a cluster.
     while np.any(Y == -1):
         B_index = np.argmax(Y == -1)
         B = data[B_index]
 
+        # Search the data point B that is closest to the geometric centers of cluster K.
         for j in range(n):
             point = data[j]
-            if Y[j] == -1 and distance.euclidean(geometric_centers[K], point) < distance.euclidean(geometric_centers[K],
-                                                                                                   B):
+            if Y[j] == -1 and distance.euclidean(geometric_centers[K], point) < distance.euclidean(geometric_centers[K], B):
                 B = point
                 B_index = j
 
+        # if the distance between the geometric center of K and the data point B is smaller than the average scale,
+        # then add the data point to the cluster and update the geometric center
+        # else let B a cluster on its own.
         if distance.euclidean(geometric_centers[K], B) < average_scale:
             Y[B_index] = K
             geometric_centers[K] = np.mean(data[Y == K], axis=0)
@@ -47,6 +55,7 @@ def NDRindex(data):
             Y[B_index] = K
             geometric_centers[K] = B
 
+    # Calculate the score of the NDRindex
     R = 0
     for i in geometric_centers:
         points_i = data[Y == i]
@@ -62,6 +71,6 @@ def NDRindex(data):
     return NDRindex
 
 
-def SC3(adata, true_labels, n_cell_types):
+"""def SC3(adata, true_labels, n_cell_types):
     sc3s.tl.consensus(adata, n_clusters=n_cell_types)
-    return adjusted_rand_score(true_labels, adata.obs[f'sc3s_{n_cell_types}'])
+    return adjusted_rand_score(true_labels, adata.obs[f'sc3s_{n_cell_types}'])"""

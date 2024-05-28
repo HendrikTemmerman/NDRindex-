@@ -1,34 +1,35 @@
-from sammon import sammon
 import scanpy as sc
-from scipy.sparse import issparse
 
-
+"""
+Dimension reduction methode: PCA
+The PCA method will reduce the gene expression matrix to its principal components. 
+The principal components are orthogonal to each other and capture the essence of the variation in the gene expressions
+"""
 def pca(data):
-    print("Starting dimensionality reduction...")
-    print("Before reduction:", data.shape)
     sc.pp.pca(data, svd_solver='arpack')
-    print("Reduced by pca:", data.obsm['X_pca'].shape)
 
-
+"""
+Dimension reduction methode: t-SNE
+The T-sne method will transform similarities between data points to joint a probabilities. 
+Then, t-SNE will minimize the divergence between the probabilities of the low-dimensional points and the high-dimensional data.
+"""
 def tsne(data):
-    print("Starting dimensionality reduction...")
-    print("Before reduction:", data.shape)
     sc.tl.tsne(data, n_pcs=50)
-    print("Reduced by tsne:", data.obsm["X_tsne"].shape)
 
-
+"""
+Dimension reduction methode: UMAP
+The method UMAP will construct a graph using the high-dimensional data and optimize a low-dimensional graph to best match the topology
+"""
 def umap(data):
-    print("Starting dimensionality reduction...")
-    print("Before reduction:", data.shape)
     sc.pp.neighbors(data, n_pcs=50, use_rep='X')
     sc.tl.umap(data)
-    print("Reduced by umap:", data.obsm["X_umap"].shape)
 
-
+"""
+Dimension reduction methode: diffmap
+The diffmap method will use diffusion maps to map the high-dimensional data to a low-dimension space.
+"""
 def diffmap(data):
-    print("Starting dimensionality reduction...")
-    print("Before reduction:", data.shape)
     sc.tl.diffmap(data)
-    print("Reduced by diffmap:", data.obsm["X_diffmap"].shape)
 
-dimension_reductions = [pca]
+"""The list of all dimension reductions we use in the experiment"""
+dimension_reductions = [pca, tsne, umap, diffmap]
