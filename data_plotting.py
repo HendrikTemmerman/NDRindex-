@@ -4,8 +4,8 @@ from statistics import mean, median
 import pandas as pd
 
 """
-The function plot_datasets will create boxplots. From the ARI data of each cluster algorithm, we are going to create boxplots. 
-In the boxplot, we are also going to indicate with a red dot the ARI values of the combination chosen by the NDR index. 
+The function plot_datasets will create boxplots of the ARI data of each cluster algorithm. 
+In the boxplot, we are also going to indicate with a red dot the ARI value of the combination chosen by the NDR index. 
 """
 def plot_datasets(datasets):
     cluster_algorithms = ['ARI-hclust', 'ARI-kmeans', 'ARI-spectral']
@@ -61,7 +61,7 @@ def plot_correlation_ARI_RNA(datasets):
 
 
 """
-The function `plot_correlation_combination_NDR` will create a barplot for each dataset, 
+The function plot_correlation_combination_NDR will create a barplot for each dataset, 
 displaying the NDR index values for each combination."""
 def plot_correlation_combination_NDR(datasets):
     for i, data in enumerate(datasets):
@@ -77,8 +77,7 @@ def plot_correlation_combination_NDR(datasets):
 
 
 """
-The function plot_combined_datasets_by_algorithm will create boxplots.
-From the ARI data of each cluster algorithm, we are going to create boxplots. 
+The function plot_combined_datasets_by_algorithm will create boxplots of the ARI data of each cluster algorithm. 
 In the boxplot, we are also going to indicate with a red dot the ARI values of the combination chosen by the NDR index. 
 The three boxplot figures are placed next to each other.
 """
@@ -119,7 +118,7 @@ data2 = pd.read_csv('output_dataframes/data_2.csv')
 data3 = pd.read_csv('output_dataframes/data_3.csv')
 datasets = [data1, data2, data3]
 
-#plot_combined_datasets_by_algorithm(datasets)
-#plot_datasets(datasets)
-#plot_correlation_ARI_RNA(datasets)
-#plot_correlation_combination_NDR(datasets)
+plot_combined_datasets_by_algorithm(datasets)
+plot_datasets(datasets)
+plot_correlation_ARI_RNA(datasets)
+plot_correlation_combination_NDR(datasets)

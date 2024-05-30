@@ -7,18 +7,15 @@ from normalisation import normalizations
 from dimensionality_reduction import dimension_reductions
 from sklearn.cluster import AgglomerativeClustering, KMeans, SpectralClustering, AffinityPropagation
 from sklearn.metrics import adjusted_rand_score
-from ndr_index import NDRindex #, SC3
+from ndr_index import NDRindex
 
-
-LOAD_DATA = False
+LOAD_DATA = True
 data_from_all_datasets = []
 
 """
 The function clustering will cluster the preprocessed data (ndr_input) by using three clustering algorithms.
-After that, we calculate the ARI of the clusters and add them to the data (dataframe).
+After that, we calculate the NDRindex and the ARI of the clusters and add them to the dataframe (data).
 """
-
-
 def clustering(data, ndr_input, true_labels, n_cell_types, combination, state):
 
     # The Agglomerative clustering algorithm.
@@ -42,7 +39,8 @@ def clustering(data, ndr_input, true_labels, n_cell_types, combination, state):
 
 
 """
-The function pre_process_data will pre process the data(dataset) with the normalization and the dimension reduction method.
+The function pre_process_data will preprocess the data(dataset) with the normalization and the dimension reduction method.
+The normalization and the dimension reduction method are given as arguments. Finally, we also save the values in a dataframe
 """
 def pre_process_data(dataset, normalize, reduce_dimension, dataset_counter, combination, run):
     adata = cp.deepcopy(dataset)
@@ -71,19 +69,17 @@ def pre_process_data(dataset, normalize, reduce_dimension, dataset_counter, comb
         else:
             ndr_input = dense_matrix
 
-    # Create a dataframe of the ndr_input and save the dataframe to a csv file.
+    # Create a dataframe of the ndr_input and save the dataframe in a csv file.
     df = pd.DataFrame(ndr_input)
     df.to_csv(f'preprocessed/{str(dataset_counter) + "+" + combination + "- " + str(run)}.csv', index=False)
     return ndr_input
 
 
 """
-The function pipeline will calculate the NDRindex and the ARI of each combination for each normalization and dimension reduction method.
-This is done by calling the function pre_process_data. We will do this an number_of_times. 
-After that we will calculate the ARI of each clusters algorithm and save the values, this is done by calling the function clustering. 
+The function pipeline will first calculate the preprocessed data of different combination of normalisation and dimension reduction method.
+This is done by calling the function pre_process_data. We will do this an number of times. 
+After that we will calculate the NDRindex and the ARI of each clusters algorithm and save the values, this is done by calling the function clustering. 
 """
-
-
 def pipeline(number_of_times):
     dataset_counter = 1
 
@@ -93,27 +89,23 @@ def pipeline(number_of_times):
 
         for run in range(1, number_of_times):
             data = {'Combination': [], 'NDRindex': [], 'ARI-hclust': [], 'ARI-kmeans': [], 'ARI-spectral': []}
-            #data = {'Combination': [], 'SC3-ARI': []}
 
-            # With each normalization and dimension reduction method we will pre process the data.
-            # We calculate the NDRindex and the ARI of each combination for each normalization and dimension reduction method.
+            # With each normalization and dimension reduction method we will preprocess the data.
             # This will be done by calling the function pre_process_data and clustering
             for normalize in normalizations:
                 for reduce_dimension in dimension_reductions:
                     combination = str(normalize.__name__) + "+" + str(reduce_dimension.__name__)
+
+                    # if the data was already preprocced then we can retrieve the values of the preprocced data from the CSV file
                     if LOAD_DATA:
                         df = pd.read_csv(f'preprocessed/{str(dataset_counter) + "+" + combination}.csv')
                         ndr_input = df.to_numpy()
                     else:
-                        adata = cp.deepcopy(dataset)
-                        adata = normalize(adata)
-                        sc.pp.neighbors(adata, use_rep='X')
-                        reduce_dimension(adata)
                         ndr_input = pre_process_data(dataset, normalize, reduce_dimension, dataset_counter, combination, run)
 
+                    # By calling the function clustering, we will calculate the NDRindex and the ARI of each clusters algorithm and
+                    # save the values in dataframe(data).
                     clustering(data, ndr_input, true_labels, n_cell_types, combination, run + dataset_counter)
-                    #data['Combination'].append(combination)
-                    #data['SC3-ARI'].append(SC3(adata, true_labels, n_cell_types))
 
             df_run = pd.DataFrame(data)
             df_list.append(df_run)

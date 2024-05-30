@@ -26,7 +26,7 @@ def log_normalization(data):
 
 """
 Normalisation methode: scale
-The scale method will address noise by scaling the gene ex-pression levels to unit variance and a mean of zero.
+The scale method will address noise by scaling the gene expression levels to unit variance and a mean of zero.
 """
 def scale(data):
     sc.pp.scale(data)
@@ -38,7 +38,7 @@ Normalisation methode: tmm
 The methode tmm will address the differences in gene expression levels by computing the M-value or log-ratio for
 each pair of samples. These values are then trimmed to reduce the impact of outliers. 
 Finally, a scaling factor is computed using the M-values, to normalize the samples.
-For using the methode tmm we used rpy2 to acces python code
+For using the methode tmm we used rpy2 to access R code in python.
 """
 def tmm(data):
     df = data.to_df()

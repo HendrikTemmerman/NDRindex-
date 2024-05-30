@@ -6,8 +6,8 @@ import scipy.stats as stats
 
 
 """
-The function anova_dimension_reduction executes the Kruskal-Wallis test on multiple datasets. With the Kruskal-Wallis test
- we can statistically demonstrate that different normalization and dimension reduction methods have significant effects on the NDRindex.
+The function anova_dimension_reduction performs the Kruskal-Wallis test on multiple datasets. With the Kruskal-Wallis test
+we can statistically prove that different normalization and dimension reduction methods have significant effects on the NDRindex.
 """
 def anova_dimension_reduction(datasets):
     alpha = 0.05
@@ -69,8 +69,7 @@ def boxplots_dimension_reduction(datasets):
 
 
 """
-The function mean_ndr_combination will create barplots of the distribution 
-of the NDRindex across different normalization methods for multiple datasets.
+The function mean_ndr_combination will create barplots of the NDRindex across different normalization methods for multiple datasets.
 """
 def mean_ndr_combination(datasets):
     for df, title in datasets:
@@ -103,7 +102,7 @@ def mean_ndr_combination(datasets):
 
 
 """
-The function pearson_correlation will calculate whether there is significant correlation between the NDR index and ARI.
+The function pearson_correlation will calculate whether there is significant correlation between the NDRindex and ARI for multiple datasets.
 """
 def pearson_correlation(datasets):
     def interpret_p_value(p_value, alpha=0.1):
@@ -135,6 +134,6 @@ data3 = pd.read_csv('output_dataframes/data_3.csv')
 data = [(data1, "dataset 1") , (data2, "dataset 2") , (data3, "dataset 3")]
 
 boxplots_dimension_reduction(data)
-#mean_ndr_combination(data)
-#pearson_correlation(data)
-#anova_dimension_reduction(data)
+mean_ndr_combination(data)
+pearson_correlation(data)
+anova_dimension_reduction(data)

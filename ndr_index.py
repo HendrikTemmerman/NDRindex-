@@ -1,6 +1,5 @@
 from scipy.spatial import distance
 import numpy as np
-#import sc3s
 
 """
 NDRindex (Normalization and Dimensionality Reduction index)
@@ -31,7 +30,7 @@ def NDRindex(data):
     M = np.percentile(distances, 25)
     average_scale = M / np.log10(n)
 
-    # If there are data points that have not yet been assigned to a cluster.
+    # Stop when all data points are assigned to a cluster.
     while np.any(Y == -1):
         B_index = np.argmax(Y == -1)
         B = data[B_index]
@@ -69,8 +68,3 @@ def NDRindex(data):
 
     NDRindex = 1.0 - (R / average_scale)
     return NDRindex
-
-
-"""def SC3(adata, true_labels, n_cell_types):
-    sc3s.tl.consensus(adata, n_clusters=n_cell_types)
-    return adjusted_rand_score(true_labels, adata.obs[f'sc3s_{n_cell_types}'])"""

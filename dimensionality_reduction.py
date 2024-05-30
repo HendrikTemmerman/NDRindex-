@@ -3,14 +3,15 @@ import scanpy as sc
 """
 Dimension reduction methode: PCA
 The PCA method will reduce the gene expression matrix to its principal components. 
-The principal components are orthogonal to each other and capture the essence of the variation in the gene expressions
+The principal components are orthogonal to each other and capture the essence of the variation in the gene expressions.
 """
 def pca(data):
     sc.pp.pca(data, svd_solver='arpack')
 
+
 """
 Dimension reduction methode: t-SNE
-The T-sne method will transform similarities between data points to joint a probabilities. 
+The t-<sne method will transform similarities between data points to joint a probabilities. 
 Then, t-SNE will minimize the divergence between the probabilities of the low-dimensional points and the high-dimensional data.
 """
 def tsne(data):
