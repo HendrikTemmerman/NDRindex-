@@ -4,11 +4,9 @@ import rpy2.robjects as robjects
 from rpy2.robjects import pandas2ri
 from rpy2.robjects.packages import importr
 
-"""
-Normalisation methode: total
-The methode total will scale the gene expression counts in each cell to ensure that the total counts per cell are equalized. 
-This results in gene expression values that can be compared across the samples
-"""
+"""Normalisation methode: total The methode total will scale the gene expression counts in each cell to ensure that 
+the total counts per cell are equalized. This results in gene expression values that can be compared across the 
+samples """
 
 
 def total(data):

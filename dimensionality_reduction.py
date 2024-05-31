@@ -11,21 +11,17 @@ def pca(data):
     sc.pp.pca(data, svd_solver='arpack')
 
 
-"""
-Dimension reduction methode: t-SNE
-The t-<sne method will transform similarities between data points to joint a probabilities. 
-Then, t-SNE will minimize the divergence between the probabilities of the low-dimensional points and the high-dimensional data.
-"""
+"""Dimension reduction methode: t-SNE The t-<sne method will transform similarities between data points to joint a 
+probabilities. Then, t-SNE will minimize the divergence between the probabilities of the low-dimensional points and 
+the high-dimensional data. """
 
 
 def tsne(data):
     sc.tl.tsne(data, n_pcs=50)
 
 
-"""
-Dimension reduction methode: UMAP
-The method UMAP will construct a graph using the high-dimensional data and optimize a low-dimensional graph to best match the topology
-"""
+"""Dimension reduction methode: UMAP The method UMAP will construct a graph using the high-dimensional data and 
+optimize a low-dimensional graph to best match the topology """
 
 
 def umap(data):

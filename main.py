@@ -39,10 +39,9 @@ def clustering(data, ndr_input, true_labels, n_cell_types, combination, state):
     data['ARI-spectral'].append(adjusted_rand_score(true_labels, spectral_labels))
 
 
-"""
-The function pre_process_data will preprocess the data(dataset) with the normalization and the dimension reduction method.
-The normalization and the dimension reduction method are given as arguments. Finally, we also save the values in a dataframe
-"""
+"""The function pre_process_data will preprocess the data(dataset) with the normalization and the dimension reduction 
+method. The normalization and the dimension reduction method are given as arguments. Finally, we also save the values 
+in a dataframe """
 
 
 def pre_process_data(dataset, normalize, reduce_dimension, dataset_counter, combination, run):
@@ -78,11 +77,10 @@ def pre_process_data(dataset, normalize, reduce_dimension, dataset_counter, comb
     return ndr_input
 
 
-"""
-The function pipeline will first calculate the preprocessed data of different combination of normalisation and dimension reduction method.
-This is done by calling the function pre_process_data. We will do this an number of times. 
-After that we will calculate the NDRindex and the ARI of each clusters algorithm and save the values, this is done by calling the function clustering. 
-"""
+"""The function pipeline will first calculate the preprocessed data of different combination of normalisation and 
+dimension reduction method. This is done by calling the function pre_process_data. We will do this an number of 
+times. After that we will calculate the NDRindex and the ARI of each clusters algorithm and save the values, 
+this is done by calling the function clustering. """
 
 
 def pipeline(number_of_times):

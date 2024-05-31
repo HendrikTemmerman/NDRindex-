@@ -4,10 +4,9 @@ import pandas as pd
 from scipy.stats import pearsonr
 import scipy.stats as stats
 
-"""
-The function anova_dimension_reduction performs the Kruskal-Wallis test on multiple datasets. With the Kruskal-Wallis test
-we can statistically prove that different normalization and dimension reduction methods have significant effects on the NDRindex.
-"""
+"""The function anova_dimension_reduction performs the Kruskal-Wallis test on multiple datasets. With the 
+Kruskal-Wallis test we can statistically prove that different normalization and dimension reduction methods have 
+significant effects on the NDRindex. """
 
 
 def anova_dimension_reduction(datasets):
@@ -43,13 +42,14 @@ def anova_dimension_reduction(datasets):
                 f"The dimension reduction method has a statistically significant effect on NDRindex (p-value = {kruskal_result_dimred.pvalue:.4f}).")
         else:
             print(
-                f"The dimension reduction method does not have a statistically significant effect on NDRindex (p-value = {kruskal_result_dimred.pvalue:.4f}).")
+                f"The dimension reduction method does not have a statistically significant effect on NDRindex ("
+                f"p-value = {kruskal_result_dimred.pvalue:.4f}).")
         print("---------------")
 
 
 """
 The function boxplots_dimension_reduction will create boxplots that compare the values of the NDRindex with different
-demension reduction methods for multiple datasets.
+dimension reduction methods for multiple datasets.
  """
 
 
@@ -76,7 +76,8 @@ def boxplots_dimension_reduction(datasets):
 
 
 """
-The function mean_ndr_combination will create barplots of the NDRindex across different normalization methods for multiple datasets.
+The function mean_ndr_combination will create barplots of the NDRindex across different normalization methods for 
+multiple datasets.
 """
 
 
@@ -110,9 +111,8 @@ def mean_ndr_combination(datasets):
         ax.legend(title='DimensionReduction')
 
 
-"""
-The function pearson_correlation will calculate whether there is significant correlation between the NDRindex and ARI for multiple datasets.
-"""
+"""The function pearson_correlation will calculate whether there is significant correlation between the NDRindex and 
+ARI for multiple datasets. """
 
 
 def pearson_correlation(datasets):

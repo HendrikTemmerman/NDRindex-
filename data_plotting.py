@@ -65,6 +65,34 @@ def plot_correlation_ARI_RNA(datasets):
 
 
 """
+For each dataset, the function plot_correlation_ARI_RNA will generate a scatterplot 
+here we combine these plots.
+"""
+
+
+def plot_combined_correlation_ARI_RNA(datasets):
+    cluster_algorithms = ['ARI-hclust', 'ARI-kmeans', 'ARI-spectral']
+    colors = ['red', 'blue', 'green']
+    fig, axes = plt.subplots(1, 3, figsize=(21, 5))  # Adjusting subplot layout to fit 3 plots in one row
+
+    for i, data in enumerate(datasets):
+        ax = axes[i]  # Selects each subplot axis for the plots
+
+        for j, cluster_algorithm in enumerate(cluster_algorithms):
+            ARIs = data[cluster_algorithm]
+            NDR = data['NDRindex']
+            ax.scatter(NDR, ARIs, color=colors[j], marker='o', label=cluster_algorithm, zorder=3)
+
+        ax.set_xlabel('NDRindex')
+        ax.set_ylabel('ARI')
+        ax.set_title(f'Correlation of ARI with NDRindex - Dataset {i + 1}')
+        ax.legend(loc='upper right')
+
+    plt.tight_layout()  # Adjust layout to prevent overlap
+    plt.savefig(f'correlation_ari_ndr/correlation_ndr_ari_combined.png')
+
+
+"""
 The function plot_correlation_combination_NDR will create a barplot for each dataset, 
 displaying the NDR index values for each combination."""
 
@@ -126,7 +154,8 @@ data2 = pd.read_csv('output_dataframes/data_2.csv')
 data3 = pd.read_csv('output_dataframes/data_3.csv')
 datasets = [data1, data2, data3]
 
-plot_combined_datasets_by_algorithm(datasets)
-plot_datasets(datasets)
-plot_correlation_ARI_RNA(datasets)
-plot_correlation_combination_NDR(datasets)
+# plot_combined_datasets_by_algorithm(datasets)
+# plot_datasets(datasets)
+# plot_correlation_ARI_RNA(datasets)
+# plot_correlation_combination_NDR(datasets)
+plot_combined_correlation_ARI_RNA(datasets)
