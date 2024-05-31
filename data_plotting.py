@@ -7,6 +7,8 @@ import pandas as pd
 The function plot_datasets will create boxplots of the ARI data of each cluster algorithm. 
 In the boxplot, we are also going to indicate with a red dot the ARI value of the combination chosen by the NDR index. 
 """
+
+
 def plot_datasets(datasets):
     cluster_algorithms = ['ARI-hclust', 'ARI-kmeans', 'ARI-spectral']
 
@@ -32,7 +34,7 @@ def plot_datasets(datasets):
         for i in range(len(ARI_data)):
             ax.scatter(i + 1, ARI_NDRindex[i], color='red', zorder=3, label='ARI of NDRindex choose' if i == 0 else "")
 
-        ax.legend( loc='upper left')
+        ax.legend(loc='upper left')
         plt.savefig(f'ari_boxplots/{cluster_algorithm}.png')
 
 
@@ -40,6 +42,8 @@ def plot_datasets(datasets):
 For each dataset, the function plot_correlation_ARI_RNA will generate a scatterplot 
 comparing the NDRindex values with the ARI values from the various clustering algorithms
 """
+
+
 def plot_correlation_ARI_RNA(datasets):
     cluster_algorithms = ['ARI-hclust', 'ARI-kmeans', 'ARI-spectral']
     colors = ['red', 'blue', 'green']
@@ -63,6 +67,8 @@ def plot_correlation_ARI_RNA(datasets):
 """
 The function plot_correlation_combination_NDR will create a barplot for each dataset, 
 displaying the NDR index values for each combination."""
+
+
 def plot_correlation_combination_NDR(datasets):
     for i, data in enumerate(datasets):
         combination = data['Combination']
@@ -81,6 +87,8 @@ The function plot_combined_datasets_by_algorithm will create boxplots of the ARI
 In the boxplot, we are also going to indicate with a red dot the ARI values of the combination chosen by the NDR index. 
 The three boxplot figures are placed next to each other.
 """
+
+
 def plot_combined_datasets_by_algorithm(datasets):
     cluster_algorithms = ['ARI-hclust', 'ARI-kmeans', 'ARI-spectral']
     dataset_labels = [f'Dataset {i + 1}' for i in range(len(datasets))]
@@ -108,7 +116,7 @@ def plot_combined_datasets_by_algorithm(datasets):
         ax.legend(loc='upper center', bbox_to_anchor=(0.5, 0.95), ncol=1)
 
     plt.tight_layout()
-    #Save the plots
+    # Save the plots
     plt.savefig('ari_boxplots/combined_datasets.png')
 
 

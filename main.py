@@ -16,8 +16,9 @@ data_from_all_datasets = []
 The function clustering will cluster the preprocessed data (ndr_input) by using three clustering algorithms.
 After that, we calculate the NDRindex and the ARI of the clusters and add them to the dataframe (data).
 """
-def clustering(data, ndr_input, true_labels, n_cell_types, combination, state):
 
+
+def clustering(data, ndr_input, true_labels, n_cell_types, combination, state):
     # The Agglomerative clustering algorithm.
     hclust = AgglomerativeClustering(n_clusters=n_cell_types, linkage='ward')
     hclust_labels = hclust.fit_predict(ndr_input)
@@ -42,6 +43,8 @@ def clustering(data, ndr_input, true_labels, n_cell_types, combination, state):
 The function pre_process_data will preprocess the data(dataset) with the normalization and the dimension reduction method.
 The normalization and the dimension reduction method are given as arguments. Finally, we also save the values in a dataframe
 """
+
+
 def pre_process_data(dataset, normalize, reduce_dimension, dataset_counter, combination, run):
     adata = cp.deepcopy(dataset)
 
@@ -80,6 +83,8 @@ The function pipeline will first calculate the preprocessed data of different co
 This is done by calling the function pre_process_data. We will do this an number of times. 
 After that we will calculate the NDRindex and the ARI of each clusters algorithm and save the values, this is done by calling the function clustering. 
 """
+
+
 def pipeline(number_of_times):
     dataset_counter = 1
 
@@ -96,15 +101,17 @@ def pipeline(number_of_times):
                 for reduce_dimension in dimension_reductions:
                     combination = str(normalize.__name__) + "+" + str(reduce_dimension.__name__)
 
-                    # if the data was already preprocced then we can retrieve the values of the preprocced data from the CSV file
+                    # if the data was already preprocessed then we can retrieve the values of the preprocced data
+                    # from the CSV file
                     if LOAD_DATA:
                         df = pd.read_csv(f'preprocessed/{str(dataset_counter) + "+" + combination}.csv')
                         ndr_input = df.to_numpy()
                     else:
-                        ndr_input = pre_process_data(dataset, normalize, reduce_dimension, dataset_counter, combination, run)
+                        ndr_input = pre_process_data(dataset, normalize, reduce_dimension, dataset_counter, combination,
+                                                     run)
 
-                    # By calling the function clustering, we will calculate the NDRindex and the ARI of each clusters algorithm and
-                    # save the values in dataframe(data).
+                    # By calling the function clustering, we will calculate the NDRindex and the ARI of each cluster
+                    # algorithm and save the values in dataframe(data).
                     clustering(data, ndr_input, true_labels, n_cell_types, combination, run + dataset_counter)
 
             df_run = pd.DataFrame(data)

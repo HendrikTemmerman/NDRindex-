@@ -9,6 +9,8 @@ Normalisation methode: total
 The methode total will scale the gene expression counts in each cell to ensure that the total counts per cell are equalized. 
 This results in gene expression values that can be compared across the samples
 """
+
+
 def total(data):
     sc.pp.normalize_total(data, target_sum=1e4)
     return data
@@ -18,6 +20,8 @@ def total(data):
 Normalisation methode: log_normalization
 The log_normalization will perform total count normalization and subsequently logarithmise the values
 """
+
+
 def log_normalization(data):
     sc.pp.normalize_total(data, target_sum=1e6)
     sc.pp.log1p(data)
@@ -28,6 +32,8 @@ def log_normalization(data):
 Normalisation methode: scale
 The scale method will address noise by scaling the gene expression levels to unit variance and a mean of zero.
 """
+
+
 def scale(data):
     sc.pp.scale(data)
     return data
@@ -40,6 +46,8 @@ each pair of samples. These values are then trimmed to reduce the impact of outl
 Finally, a scaling factor is computed using the M-values, to normalize the samples.
 For using the methode tmm we used rpy2 to access R code in python.
 """
+
+
 def tmm(data):
     df = data.to_df()
     pandas2ri.activate()

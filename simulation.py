@@ -4,8 +4,9 @@ from sklearn.datasets import make_blobs
 import numpy as np
 from ndr_index import NDRindex
 
-
 """Function to simulate data"""
+
+
 def simulate_data(centers, cluster_std, n_samples, random_state):
     X, y = make_blobs(n_samples=n_samples, centers=centers, cluster_std=cluster_std,
                       random_state=random_state)
@@ -45,7 +46,7 @@ for i in range(n):
         ndr_index = NDRindex(c[0])
         ndr_values[sd] += ndr_index
 
-ndr_values = ndr_values/n
+ndr_values = ndr_values / n
 
 """Names of the datasets"""
 datasets = ['Simulated Dataset 1', 'Simulated Dataset 2', 'Simulated Dataset 3', 'Simulated Dataset 4']
@@ -68,7 +69,8 @@ plt.yticks(fontsize=12)
 
 """Annotate values next to the points"""
 for i, value in enumerate(ndr_values):
-    plt.annotate(f'{value:.2f}', (datasets[i], ndr_values[i]), textcoords="offset points", xytext=(0,10), ha='center', fontsize=12)
+    plt.annotate(f'{value:.2f}', (datasets[i], ndr_values[i]), textcoords="offset points", xytext=(0, 10), ha='center',
+                 fontsize=12)
 
 """Display the plot"""
 plt.tight_layout()

@@ -4,22 +4,23 @@ import pandas as pd
 from scipy.stats import pearsonr
 import scipy.stats as stats
 
-
 """
 The function anova_dimension_reduction performs the Kruskal-Wallis test on multiple datasets. With the Kruskal-Wallis test
 we can statistically prove that different normalization and dimension reduction methods have significant effects on the NDRindex.
 """
+
+
 def anova_dimension_reduction(datasets):
     alpha = 0.05
 
     for df, title in datasets:
         df[['Normalization', 'DimensionReduction']] = df['Combination'].str.split('+', expand=True)
 
-        #Kruskal-Wallis Test for Normalization
+        # Kruskal-Wallis Test for Normalization
         grouped_norm = [df['NDRindex'][df['Normalization'] == norm] for norm in df['Normalization'].unique()]
         kruskal_result_norm = stats.kruskal(*grouped_norm)
 
-        #Kruskal-Wallis Test for Dimension Reduction
+        # Kruskal-Wallis Test for Dimension Reduction
         grouped_dimred = [df['NDRindex'][df['DimensionReduction'] == dimred] for dimred in
                           df['DimensionReduction'].unique()]
         kruskal_result_dimred = stats.kruskal(*grouped_dimred)
@@ -28,17 +29,21 @@ def anova_dimension_reduction(datasets):
         print(f"H-statistic: {kruskal_result_norm.statistic}, p-value: {kruskal_result_norm.pvalue}")
 
         if kruskal_result_norm.pvalue < alpha:
-            print(f"The normalization method has a statistically significant effect on NDRindex (p-value = {kruskal_result_norm.pvalue:.4f}).")
+            print(
+                f"The normalization method has a statistically significant effect on NDRindex (p-value = {kruskal_result_norm.pvalue:.4f}).")
         else:
-            print(f"The normalization method does not have a statistically significant effect on NDRindex (p-value = {kruskal_result_norm.pvalue:.4f}).")
+            print(
+                f"The normalization method does not have a statistically significant effect on NDRindex (p-value = {kruskal_result_norm.pvalue:.4f}).")
 
         print("\nKruskal-Wallis test results for Dimension Reduction methods:")
         print(f"H-statistic: {kruskal_result_dimred.statistic}, p-value: {kruskal_result_dimred.pvalue}")
 
         if kruskal_result_dimred.pvalue < alpha:
-            print(f"The dimension reduction method has a statistically significant effect on NDRindex (p-value = {kruskal_result_dimred.pvalue:.4f}).")
+            print(
+                f"The dimension reduction method has a statistically significant effect on NDRindex (p-value = {kruskal_result_dimred.pvalue:.4f}).")
         else:
-            print(f"The dimension reduction method does not have a statistically significant effect on NDRindex (p-value = {kruskal_result_dimred.pvalue:.4f}).")
+            print(
+                f"The dimension reduction method does not have a statistically significant effect on NDRindex (p-value = {kruskal_result_dimred.pvalue:.4f}).")
         print("---------------")
 
 
@@ -46,6 +51,8 @@ def anova_dimension_reduction(datasets):
 The function boxplots_dimension_reduction will create boxplots that compare the values of the NDRindex with different
 demension reduction methods for multiple datasets.
  """
+
+
 def boxplots_dimension_reduction(datasets):
     fig, axes = plt.subplots(1, 3, figsize=(24, 8), sharey=True)
 
@@ -71,6 +78,8 @@ def boxplots_dimension_reduction(datasets):
 """
 The function mean_ndr_combination will create barplots of the NDRindex across different normalization methods for multiple datasets.
 """
+
+
 def mean_ndr_combination(datasets):
     for df, title in datasets:
         df[['Normalization', 'DimensionReduction']] = df['Combination'].str.split('+', expand=True)
@@ -104,6 +113,8 @@ def mean_ndr_combination(datasets):
 """
 The function pearson_correlation will calculate whether there is significant correlation between the NDRindex and ARI for multiple datasets.
 """
+
+
 def pearson_correlation(datasets):
     def interpret_p_value(p_value, alpha=0.1):
         if p_value < alpha:
@@ -115,23 +126,26 @@ def pearson_correlation(datasets):
         # Calculate and interpret Pearson correlation for NDRindex vs ARI-hclust
         corr_ari_hclust, p_value_ari_hclust = pearsonr(df['NDRindex'], df['ARI-hclust'])
         interpretation_ari_hclust = interpret_p_value(p_value_ari_hclust)
-        print(f"Pearson correlation between NDRindex and ARI-hclust: {corr_ari_hclust:.4f} (p-value: {p_value_ari_hclust:.4e}) - {interpretation_ari_hclust}")
+        print(
+            f"Pearson correlation between NDRindex and ARI-hclust: {corr_ari_hclust:.4f} (p-value: {p_value_ari_hclust:.4e}) - {interpretation_ari_hclust}")
 
         # Calculate and interpret Pearson correlation for NDRindex vs ARI-kmeans
         corr_ari_kmeans, p_value_ari_kmeans = pearsonr(df['NDRindex'], df['ARI-kmeans'])
         interpretation_ari_kmeans = interpret_p_value(p_value_ari_kmeans)
-        print(f"Pearson correlation between NDRindex and ARI-kmeans: {corr_ari_kmeans:.4f} (p-value: {p_value_ari_kmeans:.4e}) - {interpretation_ari_kmeans}")
+        print(
+            f"Pearson correlation between NDRindex and ARI-kmeans: {corr_ari_kmeans:.4f} (p-value: {p_value_ari_kmeans:.4e}) - {interpretation_ari_kmeans}")
 
         # Calculate and interpret Pearson correlation for NDRindex vs ARI-spectral
         corr_ari_spectral, p_value_ari_spectral = pearsonr(df['NDRindex'], df['ARI-spectral'])
         interpretation_ari_spectral = interpret_p_value(p_value_ari_spectral)
-        print(f"Pearson correlation between NDRindex and ARI-spectral: {corr_ari_spectral:.4f} (p-value: {p_value_ari_spectral:.4e}) - {interpretation_ari_spectral}")
+        print(
+            f"Pearson correlation between NDRindex and ARI-spectral: {corr_ari_spectral:.4f} (p-value: {p_value_ari_spectral:.4e}) - {interpretation_ari_spectral}")
 
 
 data1 = pd.read_csv('output_dataframes/data_1.csv')
 data2 = pd.read_csv('output_dataframes/data_2.csv')
 data3 = pd.read_csv('output_dataframes/data_3.csv')
-data = [(data1, "dataset 1") , (data2, "dataset 2") , (data3, "dataset 3")]
+data = [(data1, "dataset 1"), (data2, "dataset 2"), (data3, "dataset 3")]
 
 boxplots_dimension_reduction(data)
 mean_ndr_combination(data)
